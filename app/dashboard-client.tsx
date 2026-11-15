@@ -7,10 +7,14 @@ import { createDelivery, deleteDelivery, updateDelivery } from "@/app/deliveries
 import type { DashboardData, Delivery, Garment } from "@/lib/dashboard-data";
 import { formatFullDate, formatShortDate } from "@/lib/dates";
 
+type MobileTab = "home" | "deliveries" | "statistics" | "account";
+
 function Icon({ name, size = 20 }: { name: string; size?: number }) {
   const paths: Record<string, React.ReactNode> = {
     home: <><rect x="3" y="3" width="7" height="8" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/></>,
     chart: <><path d="M4 19V5"/><path d="M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/><path d="M16 6h4v4"/></>,
+    list: <><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></>,
+    user: <><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></>,
     package: <><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></>,
     plus: <><path d="M12 5v14M5 12h14"/></>,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6"/></>,
@@ -62,6 +66,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const [draft, setDraft] = useState<Record<string, number>>({});
   const [period, setPeriod] = useState("6");
   const [activeNav, setActiveNav] = useState("Visão geral");
+  const [mobileTab, setMobileTab] = useState<MobileTab>("home");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
@@ -144,7 +149,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || selectedDropoff ? "true" : "false"}>
       <aside className="sidebar">
         <a href="#top" className="brand" aria-label="Fio a Fio, início">
           <span className="brand-mark"><Icon name="sparkle" size={20} /></span>
@@ -166,11 +171,12 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
       <section className="main-area" id="top">
         <header className="topbar">
-          <div className="breadcrumbs">A minha conta <span>/</span> <b>{activeNav}</b></div>
-          <div className="topbar-right"><span className="topbar-message"><span className="status-dot" />Tudo em dia</span><span className="mobile-avatar" aria-label={`Perfil ${data.customerName}`}>{initials}</span></div>
+          <div className="breadcrumbs">A minha conta <span>/</span> <b>{{ home: "Visão geral", deliveries: "Entregas", statistics: "Estatísticas", account: "Conta" }[mobileTab] ?? activeNav}</b></div>
+          <div className="topbar-right"><span className="topbar-message"><span className="status-dot" />Tudo em dia</span><button className="mobile-add-button" onClick={() => { setEditingDropoff(null); setDraft({}); setShowForm(true); }} disabled={!data.packageName}><Icon name="plus" size={18} /> Nova entrega</button><span className="mobile-avatar" aria-label={`Perfil ${data.customerName}`}>{initials}</span></div>
         </header>
 
         <div className="page-content">
+          {notice && <p className="inline-notice" role="status"><Icon name="check" size={17} />{notice}</p>}
           <section className="welcome-row">
             <div><p className="eyebrow"><Icon name="sun" size={15} /> O SEU MÊS DE {monthLabel.split(" ")[0].toLocaleUpperCase("pt-PT")}</p><h1>Bom dia, {data.customerName.split(" ")[0]}<span className="wave">✳</span></h1><p className="welcome-subtitle">A sua roupa está em boas mãos. Veja como vai o seu mês.</p></div>
             <button className="primary-button" onClick={() => setShowForm(true)} disabled={!data.packageName}><Icon name="plus" size={18} />Registar utilização</button>
@@ -210,15 +216,40 @@ export function DashboardClient({ data }: { data: DashboardData }) {
             </article>
           </section>
 
+          <section className="panel account-panel">
+            <p className="eyebrow">A SUA CONTA</p>
+            <div className="account-details"><span className="avatar">{initials}</span><div><h2>{data.customerName}</h2><p>{data.email}</p><p>{data.packageName ?? "Sem pacote ativo"}</p></div></div>
+            <form action={signOutAction}><button className="secondary-button" type="submit">Terminar sessão</button></form>
+          </section>
+
           <footer className="page-footer"><span>Feito com cuidado, em Lisboa <span className="footer-heart">♥</span></span><span>© 2026 Fio a Fio</span></footer>
         </div>
       </section>
 
-      {notice && <div className="toast" role="status"><span><Icon name="check" size={17} /></span>{notice}</div>}
+      <nav className="mobile-tabs" aria-label="Navegação principal">
+        {[{ id: "home", label: "Início", icon: "home" }, { id: "deliveries", label: "Entregas", icon: "list" }, { id: "statistics", label: "Estatísticas", icon: "chart" }, { id: "account", label: "Conta", icon: "user" }].map((tab) => (
+          <button key={tab.id} type="button" onClick={() => setMobileTab(tab.id as MobileTab)} className={mobileTab === tab.id ? "active" : ""} aria-current={mobileTab === tab.id ? "page" : undefined}><Icon name={tab.icon} size={21} /><span>{tab.label}</span></button>
+        ))}
+      </nav>
 
-      {selectedDropoff && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedDropoff(null); }}><section className="usage-modal detail-modal" role="dialog" aria-modal="true" aria-labelledby="delivery-title"><div className="modal-heading"><div><span className="eyebrow"><Icon name="calendar" size={14} /> ENTREGA · {formatFullDate(selectedDropoff.date).toLocaleUpperCase("pt-PT")}</span><h2 id="delivery-title">Detalhe da entrega</h2><p>Peças incluídas nesta utilização.</p></div><button className="close-button" onClick={() => setSelectedDropoff(null)} aria-label="Fechar detalhe da entrega"><Icon name="close" size={19} /></button></div><div className="delivery-detail-items">{selectedDropoff.items.map((item) => <div className="delivery-detail-item" key={item.garmentId}><span className={`garment-option-icon symbol-${item.garmentId}`}><Icon name={data.garments.find((garment) => garment.id === item.garmentId)?.icon ?? "package"} size={18} /></span><span className="garment-option-name"><strong>{item.name}</strong><small>{item.creditsPerPiece} {item.creditsPerPiece === 1 ? "crédito" : "créditos"} por peça</small></span><strong className="delivery-detail-count">{item.quantity} <small>× {item.creditsPerPiece}</small></strong><strong className="delivery-detail-subtotal">{item.quantity * item.creditsPerPiece}</strong></div>)}</div><div className="delivery-detail-total"><span>{pieceCount(selectedDropoff)} peças entregues</span><strong>{creditCount(selectedDropoff)} créditos</strong></div>{error && <p className="form-error" role="alert">{error}</p>}{confirmDelete ? <div className="delete-confirm"><p>Eliminar esta entrega e todas as peças registadas?</p><button className="quiet-button" type="button" onClick={() => setConfirmDelete(false)}>Cancelar</button><button className="danger-button" type="button" disabled={pending} onClick={() => removeDropoff(selectedDropoff)}>{pending ? "A eliminar…" : "Confirmar eliminação"}</button></div> : <div className="delivery-actions"><button className="quiet-button" type="button" onClick={() => editDropoff(selectedDropoff)}>Editar entrega</button><button className="danger-button" type="button" onClick={() => setConfirmDelete(true)}>Eliminar</button></div>}</section></div>}
+      {selectedDropoff && <section className="flow-screen" aria-labelledby="delivery-title">
+        <button className="flow-back" type="button" onClick={() => { setSelectedDropoff(null); setConfirmDelete(false); setError(""); }}><Icon name="arrow" size={18} /> Voltar às entregas</button>
+        <div className="flow-content"><p className="eyebrow">ENTREGA · {formatFullDate(selectedDropoff.date).toLocaleUpperCase("pt-PT")}</p><h1 id="delivery-title">Detalhe da entrega</h1><p className="flow-description">Peças incluídas nesta utilização.</p>
+          <div className="delivery-detail-items">{selectedDropoff.items.map((item) => <div className="delivery-detail-item" key={item.garmentId}><span className={`garment-option-icon symbol-${item.garmentId}`}><Icon name={data.garments.find((garment) => garment.id === item.garmentId)?.icon ?? "package"} size={20} /></span><span className="garment-option-name"><strong>{item.name}</strong><small>{item.creditsPerPiece} {item.creditsPerPiece === 1 ? "crédito" : "créditos"} por peça</small></span><strong className="delivery-detail-count">{item.quantity} <small>× {item.creditsPerPiece}</small></strong><strong className="delivery-detail-subtotal">{item.quantity * item.creditsPerPiece}</strong></div>)}</div>
+          <div className="delivery-detail-total"><span>{pieceCount(selectedDropoff)} peças entregues</span><strong>{creditCount(selectedDropoff)} créditos</strong></div>
+          {error && <p className="form-error" role="alert">{error}</p>}
+          {confirmDelete ? <div className="delete-confirm"><p>Eliminar esta entrega e todas as peças registadas?</p><button className="secondary-button" type="button" onClick={() => setConfirmDelete(false)}>Cancelar</button><button className="danger-button" type="button" disabled={pending} onClick={() => removeDropoff(selectedDropoff)}>{pending ? "A eliminar…" : "Confirmar eliminação"}</button></div> : <div className="delivery-actions"><button className="primary-button" type="button" onClick={() => editDropoff(selectedDropoff)}>Editar entrega</button><button className="danger-button" type="button" onClick={() => setConfirmDelete(true)}>Eliminar entrega</button></div>}
+        </div>
+      </section>}
 
-      {showForm && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget && !pending) { setShowForm(false); setEditingDropoff(null); } }}><section className="usage-modal" role="dialog" aria-modal="true" aria-labelledby="usage-title"><div className="modal-heading"><div><span className="eyebrow">A SUA CONTA, AO SEU RITMO</span><h2 id="usage-title">{editingDropoff ? "Editar entrega" : "Registar utilização"}</h2><p>Que peças deixou para cuidar {editingDropoff ? "nesta entrega" : "hoje"}?</p></div><button className="close-button" onClick={() => { setShowForm(false); setEditingDropoff(null); }} disabled={pending} aria-label="Fechar"><Icon name="close" size={19} /></button></div><form onSubmit={saveDropoff}>{editingDropoff && <label className="delivery-date-field">Data da entrega<input type="date" value={deliveryDate} onChange={(event) => setDeliveryDate(event.target.value)} required /></label>}<div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={18} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>{error && <p className="form-error" role="alert">{error}</p>}<div className="modal-summary"><span>Créditos desta entrega</span><strong>{data.garments.reduce((sum, garment) => sum + (draft[garment.id] ?? 0) * garment.slots, 0)}</strong></div><button className="primary-button modal-submit" type="submit" disabled={pending || !Object.values(draft).some((quantity) => quantity > 0)}>{pending ? "A guardar…" : editingDropoff ? "Guardar alterações" : "Guardar utilização"} <Icon name="arrow" size={16} /></button><p className="modal-footnote"><Icon name="sparkle" size={14} /> A sua utilização atualiza-se assim que guardar.</p></form></section></div>}
+      {showForm && <section className="flow-screen" aria-labelledby="usage-title">
+        <button className="flow-back" type="button" disabled={pending} onClick={() => { setShowForm(false); setEditingDropoff(null); setError(""); }}><Icon name="arrow" size={18} /> Voltar</button>
+        <div className="flow-content"><p className="eyebrow">A SUA CONTA, AO SEU RITMO</p><h1 id="usage-title">{editingDropoff ? "Editar entrega" : "Registar utilização"}</h1><p className="flow-description">Que peças deixou para cuidar {editingDropoff ? "nesta entrega" : "hoje"}?</p>
+          <form onSubmit={saveDropoff} className="flow-form">{editingDropoff && <label className="delivery-date-field">Data da entrega<input type="date" value={deliveryDate} onChange={(event) => setDeliveryDate(event.target.value)} required /></label>}<div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={20} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>
+            {error && <p className="form-error" role="alert">{error}</p>}<div className="modal-summary"><span>Créditos desta entrega</span><strong>{data.garments.reduce((sum, garment) => sum + (draft[garment.id] ?? 0) * garment.slots, 0)}</strong></div><button className="primary-button modal-submit" type="submit" disabled={pending || !Object.values(draft).some((quantity) => quantity > 0)}>{pending ? "A guardar…" : editingDropoff ? "Guardar alterações" : "Guardar utilização"} <Icon name="arrow" size={17} /></button>
+          </form>
+        </div>
+      </section>}
     </main>
   );
 }

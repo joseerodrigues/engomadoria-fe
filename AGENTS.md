@@ -15,5 +15,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Garments can consume different numbers of package slots; the slot value is configurable per garment type.
 - Customers can view their package usage for the current period and register new usage by choosing garment types and quantities in each ironing drop-off.
 - Customers can review historical usage statistics by garment category over a selected time period.
-- The customer experience must work well in desktop web browsers and on mobile devices.
+- Customers can edit or delete their recorded deliveries.
+- The customer experience must work well in desktop web browsers and on mobile devices. Mobile uses distinct tab-navigated screens, readable text sizes, and full-screen flows instead of popup dialogs.
 - These requirements are an initial project description and are expected to evolve. Update this section as requirements change, and follow the latest user-provided requirements.
