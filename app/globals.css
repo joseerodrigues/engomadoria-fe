@@ -359,6 +359,8 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .flow-content .delivery-detail-count small { font-size: 14px; }
   .flow-content .delivery-detail-total { font-size: 16px; }
   .flow-content .delivery-detail-total strong { font-size: 18px; }
+  .delivery-date-field { font-size: 14px; }
+  .delivery-date-field input { min-height: 46px; font-size: 15px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 

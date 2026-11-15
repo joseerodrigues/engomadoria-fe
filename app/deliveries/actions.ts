@@ -27,6 +27,14 @@ function toRpcItems(items: DeliveryDraftItem[]) {
   return items.map((item) => ({ garment_type_id: item.garmentTypeId, quantity: item.quantity }));
 }
 
+function validateDeliveryDate(deliveredOn: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(deliveredOn);
+  if (!match) return false;
+  const [, year, month, day] = match.map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === day;
+}
+
 function getRpcError(error: { code?: string } | null, genericMessage: string) {
   if (error?.code === "PGRST202" || error?.code === "42883") {
     return "A base de dados precisa das migrações mais recentes. Execute novamente os ficheiros SQL em supabase/migrations/ no Supabase.";
@@ -34,8 +42,9 @@ function getRpcError(error: { code?: string } | null, genericMessage: string) {
   return genericMessage;
 }
 
-export async function createDelivery(items: DeliveryDraftItem[]): Promise<{ error?: string }> {
+export async function createDelivery(items: DeliveryDraftItem[], deliveredOn: string): Promise<{ error?: string }> {
   if (!isSupabaseConfigured()) return { error: "Configure a ligação ao Supabase antes de registar uma entrega." };
+  if (!validateDeliveryDate(deliveredOn) || deliveredOn > getLisbonDate()) return { error: "Escolha uma data de entrega válida, até hoje." };
   const validationError = validateItems(items);
   if (validationError) return { error: validationError };
 
@@ -44,7 +53,7 @@ export async function createDelivery(items: DeliveryDraftItem[]): Promise<{ erro
   if (!user) return { error: "A sua sessão terminou. Inicie sessão novamente." };
 
   const { error } = await supabase.rpc("create_delivery", {
-    p_delivered_on: getLisbonDate(),
+    p_delivered_on: deliveredOn,
     p_items: toRpcItems(items),
   });
 
@@ -62,8 +71,8 @@ export async function updateDelivery(
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(deliveryId)) {
     return { error: "A entrega selecionada não é válida." };
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(deliveredOn) || deliveredOn > getLisbonDate()) {
-    return { error: "Escolha uma data de entrega válida." };
+  if (!validateDeliveryDate(deliveredOn) || deliveredOn > getLisbonDate()) {
+    return { error: "Escolha uma data de entrega válida, até hoje." };
   }
   const validationError = validateItems(items);
   if (validationError) return { error: validationError };

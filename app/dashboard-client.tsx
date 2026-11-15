@@ -63,7 +63,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [selectedDropoff, setSelectedDropoff] = useState<Delivery | null>(null);
   const [editingDropoff, setEditingDropoff] = useState<Delivery | null>(null);
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState(data.today);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [draft, setDraft] = useState<Record<string, number>>({});
   const [period, setPeriod] = useState("6");
@@ -109,7 +109,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
     startTransition(async () => {
       const result = editingDropoff
         ? await updateDelivery(editingDropoff.id, deliveryDate, items)
-        : await createDelivery(items);
+        : await createDelivery(items, deliveryDate);
       if (result.error) {
         setError(result.error);
         return;
@@ -117,7 +117,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
       setDraft({});
       setEditingDropoff(null);
-      setDeliveryDate("");
+      setDeliveryDate(data.today);
       setShowForm(false);
       setNotice(editingDropoff ? "Entrega atualizada com sucesso" : "Utilização registada com sucesso");
       window.setTimeout(() => setNotice(""), 3200);
@@ -130,6 +130,14 @@ export function DashboardClient({ data }: { data: DashboardData }) {
     setDeliveryDate(delivery.date);
     setEditingDropoff(delivery);
     setSelectedDropoff(null);
+    setError("");
+    setShowForm(true);
+  }
+
+  function newDropoff() {
+    setDraft({});
+    setEditingDropoff(null);
+    setDeliveryDate(data.today);
     setError("");
     setShowForm(true);
   }
@@ -180,14 +188,14 @@ export function DashboardClient({ data }: { data: DashboardData }) {
       <section className="main-area" id="top">
         <header className="topbar">
           <div className="breadcrumbs">A minha conta <span>/</span> <b>{{ home: "Visão geral", deliveries: "Entregas", statistics: "Estatísticas", account: "Conta" }[mobileTab] ?? activeNav}</b></div>
-          <div className="topbar-right"><span className="topbar-message"><span className="status-dot" />Tudo em dia</span><button className="mobile-add-button" onClick={() => { setEditingDropoff(null); setDraft({}); setShowForm(true); }} disabled={!data.packageName}><Icon name="plus" size={18} /> Nova entrega</button><span className="mobile-avatar" aria-label={`Perfil ${data.customerName}`}>{initials}</span></div>
+          <div className="topbar-right"><span className="topbar-message"><span className="status-dot" />Tudo em dia</span><button className="mobile-add-button" onClick={newDropoff} disabled={!data.packageName}><Icon name="plus" size={18} /> Nova entrega</button><span className="mobile-avatar" aria-label={`Perfil ${data.customerName}`}>{initials}</span></div>
         </header>
 
         <div className="page-content">
           {notice && <p className="inline-notice" role="status"><Icon name="check" size={17} />{notice}</p>}
           <section className="welcome-row">
             <div><p className="eyebrow"><Icon name="sun" size={15} /> O SEU MÊS DE {monthLabel.split(" ")[0].toLocaleUpperCase("pt-PT")}</p><h1>Bom dia, {data.customerName.split(" ")[0]}<span className="wave">✳</span></h1><p className="welcome-subtitle">A sua roupa está em boas mãos. Veja como vai o seu mês.</p></div>
-            <button className="primary-button" onClick={() => setShowForm(true)} disabled={!data.packageName}><Icon name="plus" size={18} />Registar utilização</button>
+            <button className="primary-button" onClick={newDropoff} disabled={!data.packageName}><Icon name="plus" size={18} />Registar utilização</button>
           </section>
 
           <section className="overview-grid" aria-label="Resumo do pacote">
@@ -201,7 +209,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
             <article className="stat-card"><div className="stat-card-head"><span className="stat-icon lilac"><Icon name="shirt" size={19} /></span><span className="stat-trend">ESTE MÊS</span></div><strong className="stat-value">{currentPieces}<small> peças</small></strong><p>em {currentDeliveries.length} entregas</p><div className="mini-bars" aria-hidden="true"><i style={{ height: "36%" }} /><i style={{ height: "52%" }} /><i style={{ height: "43%" }} /><i style={{ height: "69%" }} /><i style={{ height: "56%" }} /><i style={{ height: "86%" }} /><i className="bar-active" style={{ height: "72%" }} /></div><div className="stat-caption">Peças cuidadas este mês</div></article>
 
-            <article className="stat-card next-card"><div className="stat-card-head"><span className="stat-icon peach"><Icon name="clock" size={19} /></span><span className="stat-trend">A PRÓXIMA</span></div><strong className="next-date">A sua próxima<br />entrega começa aqui.</strong><p>Registe quando deixar a roupa.</p><button className="text-button" onClick={() => setShowForm(true)} disabled={!data.packageName}>Adicionar entrega <Icon name="arrow" size={15} /></button></article>
+            <article className="stat-card next-card"><div className="stat-card-head"><span className="stat-icon peach"><Icon name="clock" size={19} /></span><span className="stat-trend">A PRÓXIMA</span></div><strong className="next-date">A sua próxima<br />entrega começa aqui.</strong><p>Registe quando deixar a roupa.</p><button className="text-button" onClick={newDropoff} disabled={!data.packageName}>Adicionar entrega <Icon name="arrow" size={15} /></button></article>
           </section>
 
           <section className="content-grid">
@@ -253,7 +261,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
       {showForm && <section className="flow-screen" aria-labelledby="usage-title">
         <button className="flow-back" type="button" disabled={pending} onClick={() => { setShowForm(false); setEditingDropoff(null); setError(""); }}><Icon name="arrow" size={18} /> Voltar</button>
         <div className="flow-content"><p className="eyebrow">A SUA CONTA, AO SEU RITMO</p><h1 id="usage-title">{editingDropoff ? "Editar entrega" : "Registar utilização"}</h1><p className="flow-description">Que peças deixou para cuidar {editingDropoff ? "nesta entrega" : "hoje"}?</p>
-          <form onSubmit={saveDropoff} className="flow-form">{editingDropoff && <label className="delivery-date-field">Data da entrega<input type="date" value={deliveryDate} onChange={(event) => setDeliveryDate(event.target.value)} required /></label>}<div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={20} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>
+          <form onSubmit={saveDropoff} className="flow-form"><label className="delivery-date-field">Data da entrega<input type="date" value={deliveryDate} max={data.today} onChange={(event) => setDeliveryDate(event.target.value)} required /></label><div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={20} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>
             {error && <p className="form-error" role="alert">{error}</p>}<div className="modal-summary"><span>Créditos desta entrega</span><strong>{data.garments.reduce((sum, garment) => sum + (draft[garment.id] ?? 0) * garment.slots, 0)}</strong></div><button className="primary-button modal-submit" type="submit" disabled={pending || !Object.values(draft).some((quantity) => quantity > 0)}>{pending ? "A guardar…" : editingDropoff ? "Guardar alterações" : "Guardar utilização"} <Icon name="arrow" size={17} /></button>
           </form>
         </div>

@@ -26,6 +26,7 @@ export type Delivery = {
 export type DashboardData = {
   customerName: string;
   email: string;
+  today: string;
   packageName: string | null;
   monthlyCredits: number;
   periodStart: string;
@@ -113,6 +114,7 @@ export async function loadDashboardData(
   return {
     customerName: typeof name === "string" && name.trim() ? name.trim() : user.email?.split("@")[0] ?? "Cliente",
     email: user.email ?? "",
+    today,
     packageName: plan?.name_pt ?? null,
     monthlyCredits: plan?.monthly_credits ?? 0,
     periodStart,
