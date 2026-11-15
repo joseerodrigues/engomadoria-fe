@@ -425,7 +425,6 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 .pwa-install-content .pwa-install-help { margin-top: 9px; font-size: 12px; }
 .pwa-install-button { min-height: 42px; margin-top: 11px; padding: 0 13px; border: 1px solid #426f5c; border-radius: 7px; background: #426f5c; color: white; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .pwa-install-button:hover { background: #315943; }
-.inline-notice { display: flex; align-items: center; gap: 8px; margin: 15px auto 0; padding: 11px 13px; border: 1px solid #dce9de; border-radius: 8px; background: #f4f8f4; color: #4e6857; font-size: 13px; }
 .secondary-button { min-height: 42px; padding: 0 14px; border: 1px solid #dfe6df; border-radius: 7px; background: #fff; color: #4f6857; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .flow-screen { position: fixed; z-index: 40; inset: 0; overflow-y: auto; padding: 25px max(24px, calc((100vw - 660px) / 2)) 50px; background: var(--paper); }
 .flow-back { display: inline-flex; min-height: 44px; align-items: center; gap: 9px; padding: 0; border: 0; background: transparent; color: #4d7159; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
@@ -466,6 +465,8 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 
 @media (max-width: 640px) {
   body { font-size: 16px; }
+  /* iOS Safari zooms the page when a focused form control uses text below 16px. */
+  .auth-field input, .select-wrap select { font-size: 16px; }
   .sidebar { display: none; }
   .main-area { min-height: 100svh; margin: 0; padding: 0 0 calc(78px + env(safe-area-inset-bottom)); }
   .topbar { height: calc(58px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 17px 0; }
