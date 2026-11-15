@@ -78,6 +78,18 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
 .usage-card-top .package-validity { margin-top: 4px; color: #d7e2da; font-size: 11px; line-height: 1.4; }
 .plan-change-button { display: inline-flex; align-items: center; gap: 6px; margin-top: 11px; padding: 0; border: 0; background: transparent; color: #f1e4c7; font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
 .plan-change-button:hover { color: #fff; }
+.plan-history-link { margin-left: 14px; }
+.package-history-list { display: grid; gap: 12px; margin-top: 24px; }
+.package-history-item { padding: 19px 21px; border: 1px solid #e5e9e5; border-radius: 11px; background: white; }
+.package-history-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.package-history-head h2 { margin: 0; color: var(--ink); font-family: Georgia, 'Times New Roman', serif; font-size: 21px; font-weight: 400; }
+.package-history-status { flex: 0 0 auto; padding: 5px 9px; border-radius: 20px; background: #f2eee7; color: #746b5c; font-size: 12px; font-weight: 650; }
+.package-history-status.is-current { background: #edf4ef; color: #3e684e; }
+.package-history-item > p { margin: 7px 0 15px; color: var(--muted); font-size: 14px; }
+.package-history-item dl { display: flex; flex-wrap: wrap; gap: 20px 40px; margin: 0; }
+.package-history-item dl div { display: grid; gap: 4px; }
+.package-history-item dt { color: var(--muted); font-size: 12px; }
+.package-history-item dd { margin: 0; color: var(--ink); font-size: 14px; font-weight: 600; }
 .package-icon { display: grid; width: 37px; height: 37px; place-items: center; border: 1px solid #ffffff33; border-radius: 10px; color: #e0eae2; }
 .usage-divider { height: 1px; margin: 16px 0 12px; background: #ffffff35; }
 .usage-numbers { display: flex; align-items: flex-end; justify-content: space-between; }
@@ -512,6 +524,10 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .flow-content h1 { font-size: 31px; }
   .flow-description { margin-bottom: 20px; font-size: 15px; }
   .plan-change-button { margin-top: 13px; font-size: 14px; }
+  .plan-history-link { margin-left: 0; }
+  .package-history-item { padding: 16px; }
+  .package-history-head h2 { font-size: 20px; }
+  .package-history-item dl { gap: 13px 24px; }
   .plan-options { gap: 11px; margin-top: 21px; }
   .plan-option { min-height: 74px; padding: 14px; }
   .plan-option-copy strong { font-size: 16px; }

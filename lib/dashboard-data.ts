@@ -18,6 +18,16 @@ export type PackagePlan = {
   active: boolean;
 };
 
+export type PackagePeriod = {
+  id: string;
+  planName: string;
+  monthlyCredits: number;
+  durationMonths: number;
+  startedOn: string;
+  expiresOn: string | null;
+  status: "active" | "ended";
+};
+
 export type DeliveryItem = {
   garmentId: string;
   name: string;
@@ -40,6 +50,7 @@ export type DashboardData = {
   plans: PackagePlan[];
   packageStartedOn: string | null;
   packageExpiresOn: string | null;
+  packageHistory: PackagePeriod[];
   monthlyCredits: number;
   periodStart: string;
   periodEnd: string;
@@ -63,6 +74,14 @@ export async function loadDashboardData(
     .limit(1);
 
   if (packageError) throw new Error("Não foi possível carregar o seu pacote.");
+
+  const { data: packageHistoryRows, error: packageHistoryError } = await supabase
+    .from("customer_packages")
+    .select("id, plan_name_snapshot, monthly_credits_snapshot, duration_months_snapshot, valid_from, valid_until, status")
+    .eq("customer_id", user.id)
+    .order("valid_from", { ascending: false });
+
+  if (packageHistoryError) throw new Error("Não foi possível carregar o histórico de pacotes.");
 
   const customerPackage = customerPackages?.[0];
   const [{ data: garmentRows, error: garmentsError }, { data: planRows, error: plansError }] = await Promise.all([
@@ -138,6 +157,15 @@ export async function loadDashboardData(
     plans,
     packageStartedOn: customerPackage?.valid_from ?? null,
     packageExpiresOn: customerPackage?.valid_until ?? null,
+    packageHistory: (packageHistoryRows ?? []).map((period) => ({
+      id: period.id,
+      planName: period.plan_name_snapshot,
+      monthlyCredits: period.monthly_credits_snapshot,
+      durationMonths: period.duration_months_snapshot,
+      startedOn: period.valid_from,
+      expiresOn: period.valid_until,
+      status: period.status,
+    })),
     monthlyCredits: currentPlan?.monthlyCredits ?? 0,
     periodStart,
     periodEnd,

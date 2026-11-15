@@ -80,6 +80,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const dropoffs = data.deliveries;
   const [showForm, setShowForm] = useState(false);
   const [showPlanPicker, setShowPlanPicker] = useState(false);
+  const [showPlanHistory, setShowPlanHistory] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [selectedDropoff, setSelectedDropoff] = useState<Delivery | null>(null);
   const [editingDropoff, setEditingDropoff] = useState<Delivery | null>(null);
@@ -221,7 +222,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   }
 
   return (
-    <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || showPlanPicker || selectedDropoff ? "true" : "false"}>
+    <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || showPlanPicker || showPlanHistory || selectedDropoff ? "true" : "false"}>
       <aside className="sidebar">
         <a href="#top" className="brand" aria-label="Fio a Fio, início">
           <span className="brand-mark"><Icon name="sparkle" size={20} /></span>
@@ -256,7 +257,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
           <section className="overview-grid" aria-label="Resumo do pacote">
             <article className={`usage-card ${overPlanLimit ? "usage-over-limit" : ""}`} id="package">
-              <div className="usage-card-top"><div><span className="card-eyebrow light">O MEU PACOTE <span className="current-pill">{data.packageName ? "ATIVO" : "SEM PACOTE"}</span></span><h2>{data.packageName ?? "Pacote por atribuir"}</h2><p>{data.packageName ? "O seu ritmo, ao seu cuidado." : "Escolha um pacote para começar."}</p>{data.packageStartedOn && <p className="package-validity">Ativo desde {formatShortDate(data.packageStartedOn)} · expira {data.packageExpiresOn ? formatShortDate(data.packageExpiresOn) : "sem data definida"} {data.packageExpiresOn?.slice(0, 4)}</p>}<button className="plan-change-button" type="button" onClick={() => { setPlanError(""); setShowPlanPicker(true); }}>{data.packageName ? "Mudar pacote" : "Escolher pacote"} <Icon name="arrow" size={15} /></button></div><div className="package-icon"><Icon name="package" size={24} /></div></div>
+              <div className="usage-card-top"><div><span className="card-eyebrow light">O MEU PACOTE <span className="current-pill">{data.packageName ? "ATIVO" : "SEM PACOTE"}</span></span><h2>{data.packageName ?? "Pacote por atribuir"}</h2><p>{data.packageName ? "O seu ritmo, ao seu cuidado." : "Escolha um pacote para começar."}</p>{data.packageStartedOn && <p className="package-validity">Ativo desde {formatShortDate(data.packageStartedOn)} · expira {data.packageExpiresOn ? formatShortDate(data.packageExpiresOn) : "sem data definida"} {data.packageExpiresOn?.slice(0, 4)}</p>}<button className="plan-change-button" type="button" onClick={() => { setPlanError(""); setShowPlanPicker(true); }}>{data.packageName ? "Mudar pacote" : "Escolher pacote"} <Icon name="arrow" size={15} /></button><button className="plan-change-button plan-history-link" type="button" onClick={() => setShowPlanHistory(true)}>Histórico de pacotes <Icon name="arrow" size={15} /></button></div><div className="package-icon"><Icon name="package" size={24} /></div></div>
               <div className="usage-divider" />
               <div className="usage-numbers"><div><strong className={overPlanLimit ? "credit-over-limit" : ""}>{currentCredits}<span> / {data.monthlyCredits}</span></strong><small>créditos utilizados</small></div><div className="remaining"><strong>{Math.max(0, data.monthlyCredits - currentCredits)}</strong><small>créditos disponíveis</small></div></div>
               <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
@@ -312,6 +313,18 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           <div className="delivery-detail-total"><span>{pieceCount(selectedDropoff)} peças entregues</span><strong>{creditCount(selectedDropoff)} créditos</strong></div>
           {error && <p className="form-error" role="alert">{error}</p>}
           {confirmDelete ? <div className="delete-confirm"><p>Eliminar esta entrega e todas as peças registadas?</p><button className="secondary-button" type="button" onClick={() => setConfirmDelete(false)}>Cancelar</button><button className="danger-button" type="button" disabled={pending} onClick={() => removeDropoff(selectedDropoff)}>{pending ? "A eliminar…" : "Confirmar eliminação"}</button></div> : <div className="delivery-actions"><button className="primary-button" type="button" onClick={() => editDropoff(selectedDropoff)} aria-label="Editar entrega" title="Editar entrega"><Icon name="edit" size={18} /><span className="desktop-action-label">Editar entrega</span></button><button className="danger-button" type="button" onClick={() => setConfirmDelete(true)} aria-label="Eliminar entrega" title="Eliminar entrega"><Icon name="trash" size={18} /><span className="desktop-action-label">Eliminar entrega</span></button></div>}
+        </div>
+      </section>}
+
+      {showPlanHistory && <section className="flow-screen" aria-labelledby="plan-history-title">
+        <button className="flow-back" type="button" onClick={() => setShowPlanHistory(false)}><Icon name="arrow" size={18} /> Voltar ao pacote</button>
+        <div className="flow-content"><p className="eyebrow">O SEU PACOTE</p><h1 id="plan-history-title">Histórico de pacotes</h1><p className="flow-description">Consulte os pacotes que já teve, com as respetivas datas e limites.</p>
+          {data.packageHistory.length ? <div className="package-history-list">{data.packageHistory.map((item) => {
+            const expired = Boolean(item.expiresOn && item.expiresOn < data.today);
+            const current = item.status === "active" && !expired;
+            const state = current ? "Ativo" : expired ? "Expirado" : "Terminado";
+            return <article className="package-history-item" key={item.id}><div className="package-history-head"><h2>{item.planName}</h2><span className={`package-history-status ${current ? "is-current" : ""}`}>{state}</span></div><p>{item.monthlyCredits} créditos por mês · {item.durationMonths} {item.durationMonths === 1 ? "mês" : "meses"}</p><dl><div><dt>Início</dt><dd>{formatFullDate(item.startedOn)}</dd></div><div><dt>Fim</dt><dd>{item.expiresOn ? formatFullDate(item.expiresOn) : "Sem data definida"}</dd></div></dl></article>;
+          })}</div> : <p className="empty-activity">Ainda não existe histórico de pacotes.</p>}
         </div>
       </section>}
 

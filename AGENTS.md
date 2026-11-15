@@ -14,6 +14,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Packages can be configured by garment capacity, for example, 30 pieces per month.
 - Customers can switch among active package plans; a plan change takes effect immediately and must preserve prior package and delivery history.
 - Package plans can have a finite duration measured from each package activation date; expired packages stop being available for delivery registration.
+- Customers can review their package history, including each plan's saved name, monthly credits, duration, and activation and expiry dates.
 - Every database insert, update, or delete on app-owned customer, delivery, package, garment, and auth-user data must be captured in restricted audit logs.
 - Garments can consume different numbers of package slots; the slot value is configurable per garment type.
 - Customers can view their package usage for the current period and register new usage by choosing garment types and quantities in each ironing drop-off.
