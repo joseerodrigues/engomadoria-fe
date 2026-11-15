@@ -332,9 +332,11 @@ export function DashboardClient({ data }: { data: DashboardData }) {
         <button className="flow-back" type="button" disabled={pending} onClick={() => setShowPlanPicker(false)}><Icon name="arrow" size={18} /> Voltar ao pacote</button>
         <div className="flow-content"><p className="eyebrow">O SEU PACOTE</p><h1 id="plan-title">Escolha o seu ritmo</h1><p className="flow-description">A alteração entra em vigor hoje. As entregas já registadas neste mês continuam a contar para o limite do novo pacote.</p>
           {planError && <p className="form-error" role="alert">{planError}</p>}
+          {currentCredits > 0 && <p className="flow-description">Já utilizou {currentCredits} créditos este mês. Só pode escolher um pacote com pelo menos esse limite.</p>}
           <div className="plan-options">{data.plans.filter((plan) => plan.active).map((plan) => {
             const current = plan.id === data.currentPlanId;
-            return <button className={`plan-option ${current ? "current" : ""}`} key={plan.id} type="button" disabled={pending || current} aria-pressed={current} onClick={() => choosePlan(plan.id)}><span className="plan-option-copy"><strong>{plan.name}</strong><small>{plan.monthlyCredits} créditos por mês · {plan.durationMonths} {plan.durationMonths === 1 ? "mês" : "meses"}</small></span><span className="plan-option-action">{current ? "Pacote atual" : pending ? "A atualizar…" : "Escolher"}</span></button>;
+            const blockedByUsage = !current && currentCredits > plan.monthlyCredits;
+            return <button className={`plan-option ${current ? "current" : ""}`} key={plan.id} type="button" disabled={pending || current || blockedByUsage} aria-pressed={current} onClick={() => choosePlan(plan.id)}><span className="plan-option-copy"><strong>{plan.name}</strong><small>{plan.monthlyCredits} créditos por mês · {plan.durationMonths} {plan.durationMonths === 1 ? "mês" : "meses"}</small></span><span className="plan-option-action">{current ? "Pacote atual" : blockedByUsage ? "Abaixo da utilização" : pending ? "A atualizar…" : "Escolher"}</span></button>;
           })}</div>
         </div>
       </section>}

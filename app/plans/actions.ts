@@ -18,6 +18,9 @@ export async function switchPlan(planId: string): Promise<{ error?: string }> {
   if (error?.code === "PGRST202" || error?.code === "42883") {
     return { error: "A base de dados precisa das migrações mais recentes. Execute novamente os ficheiros SQL em supabase/migrations/ no Supabase." };
   }
+  if (error?.message.includes("Plan downgrade would exceed monthly credit limit")) {
+    return { error: "Este pacote tem menos créditos do que já utilizou este mês. Escolha um pacote com limite igual ou superior à utilização atual." };
+  }
   if (error) return { error: "Não foi possível mudar de pacote. Atualize a página e tente novamente." };
 
   revalidatePath("/");

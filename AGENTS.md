@@ -19,6 +19,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Garments can consume different numbers of package slots; the slot value is configurable per garment type.
 - Customers can view their package usage for the current period and register new usage by choosing garment types and quantities in each ironing drop-off.
 - Delivery writes must enforce the package's monthly credit limit; reject any write that would exceed it and offer plan switching as the path to more capacity.
+- Customers cannot switch to a plan whose monthly credit limit is below credits already used in the current month.
 - Customers can review historical usage statistics by garment category over a selected time period.
 - Customers can edit or delete their recorded deliveries.
 - The customer experience must work well in desktop web browsers and on mobile devices. Mobile uses distinct tab-navigated screens, readable text sizes, and full-screen flows instead of popup dialogs.
