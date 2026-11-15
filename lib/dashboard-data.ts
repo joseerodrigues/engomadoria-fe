@@ -165,7 +165,12 @@ export async function loadDashboardData(
       startedOn: period.valid_from,
       expiresOn: period.valid_until,
       status: period.status,
-    })),
+    })).sort((a, b) => {
+      const aIsActive = a.status === "active" && a.startedOn <= today && (!a.expiresOn || a.expiresOn >= today);
+      const bIsActive = b.status === "active" && b.startedOn <= today && (!b.expiresOn || b.expiresOn >= today);
+      if (aIsActive !== bIsActive) return aIsActive ? -1 : 1;
+      return b.startedOn.localeCompare(a.startedOn);
+    }),
     monthlyCredits: currentPlan?.monthlyCredits ?? 0,
     periodStart,
     periodEnd,
