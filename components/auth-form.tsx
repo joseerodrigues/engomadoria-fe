@@ -36,7 +36,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   return (
     <main className="auth-shell">
       <Link href="/" className="brand auth-brand" aria-label="Roupa em Dia, por Engomadoria Gest, início">
-        <Image className="brand-mark" src="/icon-192.png" alt="" width={32} height={32} priority />
+        <Image className="brand-mark" src="/icon-192-v2.png" alt="" width={32} height={32} priority />
         <span className="brand-copy"><span className="brand-title">Roupa em Dia</span><small className="brand-provider">por Engomadoria Gest</small></span>
       </Link>
       <section className="auth-card">

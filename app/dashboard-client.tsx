@@ -227,7 +227,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
     <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || showPlanPicker || showPlanHistory || selectedDropoff ? "true" : "false"}>
       <aside className="sidebar">
         <a href="#top" className="brand" aria-label="Roupa em Dia, por Engomadoria Gest, início">
-          <Image className="brand-mark" src="/icon-192.png" alt="" width={32} height={32} priority />
+          <Image className="brand-mark" src="/icon-192-v2.png" alt="" width={32} height={32} priority />
           <span className="brand-copy"><span className="brand-title">Roupa em Dia</span><small className="brand-provider">por Engomadoria Gest</small></span>
         </a>
         <div className="workspace-label">A MINHA CONTA</div>
