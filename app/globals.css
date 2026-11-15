@@ -424,6 +424,7 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 .flow-content .delivery-detail-total strong { font-size: 15px; }
 .flow-content .delivery-actions { flex-wrap: wrap; }
 .flow-content .delivery-actions button { width: 48px; min-height: 46px; padding: 0; font-size: 13px; }
+.flow-content .delivery-actions .danger-button { display: inline-flex; align-items: center; justify-content: center; }
 .flow-content .delivery-actions .desktop-action-label { display: none; }
 .flow-content .delete-confirm p { font-size: 14px; }
 .flow-content .danger-button { min-height: 44px; padding: 0 14px; font-size: 13px; }
