@@ -320,6 +320,46 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .auth-card, .setup-card { padding: 25px 20px; }
   .auth-card h1, .setup-card h1 { font-size: 26px; }
 }
+
+@media (min-width: 641px) {
+  body { font-size: 16px; }
+  .nav-link { font-size: 13px; }
+  .breadcrumbs { font-size: 13px; }
+  .welcome-row .eyebrow, .card-eyebrow { font-size: 11px; }
+  .welcome-subtitle { font-size: 14px; }
+  .welcome-row h1 { font-size: clamp(34px, 3.3vw, 42px); }
+  .primary-button { font-size: 13px; }
+  .usage-card-top p, .usage-numbers small, .usage-foot { font-size: 12px; }
+  .usage-numbers strong { font-size: 27px; }
+  .usage-numbers strong span { font-size: 16px; }
+  .usage-numbers .remaining strong { font-size: 20px; }
+  .stat-trend { font-size: 10px; }
+  .stat-card > p, .stat-caption { font-size: 12px; }
+  .panel-heading h2 { font-size: 20px; }
+  .panel-heading p { font-size: 13px; }
+  .activity-row { min-height: 76px; gap: 10px; }
+  .activity-item { min-height: 75px; gap: 12px; }
+  .activity-icon { width: 38px; height: 38px; flex-basis: 38px; }
+  .activity-copy { gap: 5px; }
+  .activity-copy strong { font-size: 14px; }
+  .activity-copy > span { font-size: 12px; }
+  .activity-meta strong { font-size: 12px; }
+  .activity-meta small { font-size: 11px; }
+  .activity-row-actions { gap: 8px; }
+  .icon-action { width: 44px; height: 44px; }
+  .category-name, .category-count { font-size: 12px; }
+  .category-note p { font-size: 12px; }
+  .flow-content { width: min(100%, 760px); }
+  .flow-content h1 { font-size: 38px; }
+  .flow-description { font-size: 18px; }
+  .flow-content .delivery-detail-item { min-height: 86px; gap: 15px; }
+  .flow-content .delivery-detail-item .garment-option-name strong { font-size: 18px; }
+  .flow-content .delivery-detail-item .garment-option-name small { font-size: 15px; }
+  .flow-content .delivery-detail-count, .flow-content .delivery-detail-subtotal { font-size: 17px; }
+  .flow-content .delivery-detail-count small { font-size: 14px; }
+  .flow-content .delivery-detail-total { font-size: 16px; }
+  .flow-content .delivery-detail-total strong { font-size: 18px; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 
 .mobile-tabs { display: none; }
