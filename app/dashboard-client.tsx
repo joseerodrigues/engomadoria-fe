@@ -252,10 +252,10 @@ export function DashboardClient({ data }: { data: DashboardData }) {
         </header>
 
         <div className="page-content">
-          {notice && <p className="inline-notice" role="status"><Icon name="check" size={17} />{notice}</p>}
+          {notice && <div className="toast" role="status"><span><Icon name="check" size={16} /></span>{notice}</div>}
           <section className="welcome-row">
             <div><p className="eyebrow"><Icon name="sun" size={15} /> O SEU MÊS DE {monthLabel.split(" ")[0].toLocaleUpperCase("pt-PT")}</p><h1>Bom dia, {data.customerName.split(" ")[0]}<span className="wave"><SparkleMark /></span></h1><p className="welcome-subtitle">A sua roupa está em boas mãos. Veja como vai o seu mês.</p></div>
-            <button className="primary-button" onClick={newDropoff} disabled={!data.packageName}><Icon name="plus" size={18} />Registar utilização</button>
+            <button className="primary-button" onClick={newDropoff} disabled={!data.packageName}><Icon name="plus" size={18} />Nova entrega</button>
           </section>
 
           <section className="overview-grid" aria-label="Resumo do pacote">
@@ -347,7 +347,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
       {showForm && <section className="flow-screen" aria-labelledby="usage-title">
         <button className="flow-back" type="button" disabled={pending} onClick={() => { setShowForm(false); setEditingDropoff(null); setError(""); }}><Icon name="arrow" size={18} /> Voltar</button>
-        <div className="flow-content"><p className="eyebrow">A SUA CONTA, AO SEU RITMO</p><h1 id="usage-title">{editingDropoff ? "Editar entrega" : "Registar utilização"}</h1><p className="flow-description">Que peças deixou para cuidar {editingDropoff ? "nesta entrega" : "hoje"}?</p>
+        <div className="flow-content"><p className="eyebrow">A SUA CONTA, AO SEU RITMO</p><h1 id="usage-title">{editingDropoff ? "Editar entrega" : "Nova entrega"}</h1><p className="flow-description">Que peças deixou para cuidar {editingDropoff ? "nesta entrega" : "hoje"}?</p>
           <form onSubmit={saveDropoff} className="flow-form">
             <div className="delivery-date-field">
               <span>Data da entrega</span>
