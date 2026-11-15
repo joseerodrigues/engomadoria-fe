@@ -1,11 +1,11 @@
-create table public.package_plans (
+create table if not exists public.package_plans (
   id text primary key,
   name_pt text not null,
   monthly_credits integer not null check (monthly_credits > 0),
   is_active boolean not null default true
 );
 
-create table public.garment_types (
+create table if not exists public.garment_types (
   id text primary key,
   name_pt text not null,
   singular_pt text not null,
@@ -14,7 +14,7 @@ create table public.garment_types (
   is_active boolean not null default true
 );
 
-create table public.customer_packages (
+create table if not exists public.customer_packages (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid not null references auth.users (id) on delete cascade,
   plan_id text not null references public.package_plans (id),
@@ -24,13 +24,13 @@ create table public.customer_packages (
   check (valid_until is null or valid_until >= valid_from)
 );
 
-create unique index customer_packages_one_active_idx
+create unique index if not exists customer_packages_one_active_idx
   on public.customer_packages (customer_id)
   where status = 'active';
 
-create index customer_packages_customer_idx on public.customer_packages (customer_id, valid_from desc);
+create index if not exists customer_packages_customer_idx on public.customer_packages (customer_id, valid_from desc);
 
-create table public.deliveries (
+create table if not exists public.deliveries (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid not null references auth.users (id) on delete cascade,
   customer_package_id uuid not null references public.customer_packages (id),
@@ -38,10 +38,10 @@ create table public.deliveries (
   created_at timestamptz not null default now()
 );
 
-create index deliveries_customer_date_idx on public.deliveries (customer_id, delivered_on desc);
-create index deliveries_package_date_idx on public.deliveries (customer_package_id, delivered_on desc);
+create index if not exists deliveries_customer_date_idx on public.deliveries (customer_id, delivered_on desc);
+create index if not exists deliveries_package_date_idx on public.deliveries (customer_package_id, delivered_on desc);
 
-create table public.delivery_items (
+create table if not exists public.delivery_items (
   id uuid primary key default gen_random_uuid(),
   delivery_id uuid not null references public.deliveries (id) on delete cascade,
   garment_type_id text not null references public.garment_types (id),
@@ -51,8 +51,8 @@ create table public.delivery_items (
   unique (delivery_id, garment_type_id)
 );
 
-create index delivery_items_delivery_idx on public.delivery_items (delivery_id);
-create index delivery_items_garment_idx on public.delivery_items (garment_type_id);
+create index if not exists delivery_items_delivery_idx on public.delivery_items (delivery_id);
+create index if not exists delivery_items_garment_idx on public.delivery_items (garment_type_id);
 
 insert into public.package_plans (id, name_pt, monthly_credits)
 values ('essential-30', 'Essencial', 30)
@@ -72,7 +72,7 @@ on conflict (id) do update set
   icon = excluded.icon,
   is_active = true;
 
-create function public.create_customer_package_for_new_user()
+create or replace function public.create_customer_package_for_new_user()
 returns trigger
 language plpgsql
 security definer
@@ -92,11 +92,12 @@ $$;
 
 revoke all on function public.create_customer_package_for_new_user() from public, anon, authenticated;
 
+drop trigger if exists on_auth_user_created_create_package on auth.users;
 create trigger on_auth_user_created_create_package
   after insert on auth.users
   for each row execute function public.create_customer_package_for_new_user();
 
-create function public.create_delivery(p_delivered_on date, p_items jsonb)
+create or replace function public.create_delivery(p_delivered_on date, p_items jsonb)
 returns uuid
 language plpgsql
 security definer
@@ -185,20 +186,25 @@ alter table public.delivery_items enable row level security;
 revoke all on public.package_plans, public.garment_types, public.customer_packages, public.deliveries, public.delivery_items from anon, authenticated;
 grant select on public.package_plans, public.garment_types, public.customer_packages, public.deliveries, public.delivery_items to authenticated;
 
+drop policy if exists "authenticated users can read package plans" on public.package_plans;
 create policy "authenticated users can read package plans"
   on public.package_plans for select to authenticated using (true);
 
+drop policy if exists "authenticated users can read garment types" on public.garment_types;
 create policy "authenticated users can read garment types"
   on public.garment_types for select to authenticated using (true);
 
+drop policy if exists "customers can read their own packages" on public.customer_packages;
 create policy "customers can read their own packages"
   on public.customer_packages for select to authenticated
   using ((select auth.uid()) is not null and customer_id = (select auth.uid()));
 
+drop policy if exists "customers can read their own deliveries" on public.deliveries;
 create policy "customers can read their own deliveries"
   on public.deliveries for select to authenticated
   using ((select auth.uid()) is not null and customer_id = (select auth.uid()));
 
+drop policy if exists "customers can read their own delivery items" on public.delivery_items;
 create policy "customers can read their own delivery items"
   on public.delivery_items for select to authenticated
   using (

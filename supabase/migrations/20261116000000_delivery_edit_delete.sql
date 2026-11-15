@@ -1,4 +1,4 @@
-create function public.update_delivery(p_delivery_id uuid, p_delivered_on date, p_items jsonb)
+create or replace function public.update_delivery(p_delivery_id uuid, p_delivered_on date, p_items jsonb)
 returns void
 language plpgsql
 security definer
@@ -83,7 +83,7 @@ begin
 end;
 $$;
 
-create function public.delete_delivery(p_delivery_id uuid)
+create or replace function public.delete_delivery(p_delivery_id uuid)
 returns void
 language plpgsql
 security definer

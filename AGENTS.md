@@ -17,4 +17,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Customers can review historical usage statistics by garment category over a selected time period.
 - Customers can edit or delete their recorded deliveries.
 - The customer experience must work well in desktop web browsers and on mobile devices. Mobile uses distinct tab-navigated screens, readable text sizes, and full-screen flows instead of popup dialogs.
+- Database migrations must account for existing data and be safe to re-run against an initialized schema: use idempotent DDL, explicit backfills or deterministic upserts when replacing catalog/configuration rows, preserve customer history by default, and never assume production tables are empty.
 - These requirements are an initial project description and are expected to evolve. Update this section as requirements change, and follow the latest user-provided requirements.

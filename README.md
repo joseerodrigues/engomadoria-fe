@@ -17,6 +17,8 @@ Customer dashboard for managing an ironing package. Customer accounts, package u
 
 New accounts receive an active Essencial package with 30 monthly credits. Delivery records snapshot garment names and credit values so later catalog changes do not rewrite history. A new account starts with no deliveries.
 
+The current SQL migrations can be safely run again against the initialized schema. Migrations that change catalog or configuration data should use deterministic upserts so existing rows can be replaced. Schema changes should preserve customer package and delivery history unless a migration explicitly documents a data replacement.
+
 The migration enables row-level security and only grants customers read access to their own records. Delivery creation is performed through a database function that checks the signed-in user, active package, garment catalog, quantities, and current credit values.
 
 ## Environment variables
