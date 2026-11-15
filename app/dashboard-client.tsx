@@ -15,6 +15,8 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
     chart: <><path d="M4 19V5"/><path d="M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/><path d="M16 6h4v4"/></>,
     list: <><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></>,
     user: <><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/></>,
+    edit: <><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></>,
+    trash: <><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6"/><path d="M10 11v5m4-5v5"/></>,
     package: <><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/></>,
     plus: <><path d="M12 5v14M5 12h14"/></>,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6"/></>,
@@ -148,6 +150,12 @@ export function DashboardClient({ data }: { data: DashboardData }) {
     });
   }
 
+  function requestDeleteDropoff(delivery: Delivery) {
+    setSelectedDropoff(delivery);
+    setConfirmDelete(true);
+    setError("");
+  }
+
   return (
     <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || selectedDropoff ? "true" : "false"}>
       <aside className="sidebar">
@@ -203,7 +211,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                 {dropoffs.length === 0 && <p className="empty-activity">Ainda não tem entregas. Registe a primeira quando deixar roupa para engomar.</p>}
                 {dropoffs.slice(0, showAllActivity ? dropoffs.length : 4).map((delivery) => {
                   const description = delivery.items.map((item) => `${item.quantity} ${item.name.toLocaleLowerCase("pt-PT")}`).join(", ");
-                  return <button type="button" className="activity-item" key={delivery.id} aria-label={`Ver entrega de ${formatShortDate(delivery.date)}: ${description}`} onClick={() => setSelectedDropoff(delivery)}><span className="activity-icon"><Icon name="package" size={17} /></span><span className="activity-copy"><strong>Entrega de roupa</strong><span>{description || "Sem peças"}</span></span><span className="activity-meta"><strong>{pieceCount(delivery)} peças <span>·</span> {creditCount(delivery)} créditos</strong><small>{formatShortDate(delivery.date)}</small></span><span className="activity-open" aria-hidden="true"><Icon name="arrow" size={14} /></span></button>;
+                  return <div className="activity-row" key={delivery.id}><button type="button" className="activity-item" aria-label={`Ver entrega de ${formatShortDate(delivery.date)}: ${description}`} onClick={() => setSelectedDropoff(delivery)}><span className="activity-icon"><Icon name="package" size={17} /></span><span className="activity-copy"><strong>Entrega de roupa</strong><span>{description || "Sem peças"}</span></span><span className="activity-meta"><strong>{pieceCount(delivery)} peças <span>·</span> {creditCount(delivery)} créditos</strong><small>{formatShortDate(delivery.date)}</small></span><span className="activity-open" aria-hidden="true"><Icon name="arrow" size={14} /></span></button><div className="activity-row-actions"><button type="button" className="icon-action edit-action" onClick={() => editDropoff(delivery)} aria-label="Editar entrega" title="Editar entrega"><Icon name="edit" size={17} /></button><button type="button" className="icon-action delete-action" onClick={() => requestDeleteDropoff(delivery)} aria-label="Eliminar entrega" title="Eliminar entrega"><Icon name="trash" size={17} /></button></div></div>;
                 })}
               </div>
               {dropoffs.length > 4 && <button className="mobile-see-all" onClick={() => setShowAllActivity((value) => !value)}>{showAllActivity ? "Ver menos" : "Ver toda a atividade"} <Icon name="arrow" size={14} /></button>}
@@ -238,7 +246,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           <div className="delivery-detail-items">{selectedDropoff.items.map((item) => <div className="delivery-detail-item" key={item.garmentId}><span className={`garment-option-icon symbol-${item.garmentId}`}><Icon name={data.garments.find((garment) => garment.id === item.garmentId)?.icon ?? "package"} size={20} /></span><span className="garment-option-name"><strong>{item.name}</strong><small>{item.creditsPerPiece} {item.creditsPerPiece === 1 ? "crédito" : "créditos"} por peça</small></span><strong className="delivery-detail-count">{item.quantity} <small>× {item.creditsPerPiece}</small></strong><strong className="delivery-detail-subtotal">{item.quantity * item.creditsPerPiece}</strong></div>)}</div>
           <div className="delivery-detail-total"><span>{pieceCount(selectedDropoff)} peças entregues</span><strong>{creditCount(selectedDropoff)} créditos</strong></div>
           {error && <p className="form-error" role="alert">{error}</p>}
-          {confirmDelete ? <div className="delete-confirm"><p>Eliminar esta entrega e todas as peças registadas?</p><button className="secondary-button" type="button" onClick={() => setConfirmDelete(false)}>Cancelar</button><button className="danger-button" type="button" disabled={pending} onClick={() => removeDropoff(selectedDropoff)}>{pending ? "A eliminar…" : "Confirmar eliminação"}</button></div> : <div className="delivery-actions"><button className="primary-button" type="button" onClick={() => editDropoff(selectedDropoff)}>Editar entrega</button><button className="danger-button" type="button" onClick={() => setConfirmDelete(true)}>Eliminar entrega</button></div>}
+          {confirmDelete ? <div className="delete-confirm"><p>Eliminar esta entrega e todas as peças registadas?</p><button className="secondary-button" type="button" onClick={() => setConfirmDelete(false)}>Cancelar</button><button className="danger-button" type="button" disabled={pending} onClick={() => removeDropoff(selectedDropoff)}>{pending ? "A eliminar…" : "Confirmar eliminação"}</button></div> : <div className="delivery-actions"><button className="primary-button" type="button" onClick={() => editDropoff(selectedDropoff)} aria-label="Editar entrega" title="Editar entrega"><Icon name="edit" size={18} /><span className="desktop-action-label">Editar entrega</span></button><button className="danger-button" type="button" onClick={() => setConfirmDelete(true)} aria-label="Eliminar entrega" title="Eliminar entrega"><Icon name="trash" size={18} /><span className="desktop-action-label">Eliminar entrega</span></button></div>}
         </div>
       </section>}
 

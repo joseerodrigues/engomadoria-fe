@@ -112,9 +112,16 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
 .panel-heading p { margin: 0; color: #98a09b; font-size: 10px; }
 .quiet-button { gap: 5px; padding-top: 4px; white-space: nowrap; }
 .activity-list { margin-top: 13px; }
-.activity-item { display: flex; min-height: 58px; align-items: center; gap: 10px; border-top: 1px solid #f0f1ef; }
+.activity-row { display: flex; min-width: 0; align-items: center; gap: 8px; border-top: 1px solid #f0f1ef; }
+.activity-item { display: flex; min-width: 0; min-height: 58px; flex: 1; align-items: center; gap: 10px; border: 0; }
 button.activity-item { width: 100%; padding: 0; border-right: 0; border-bottom: 0; border-left: 0; background: #fff; text-align: left; cursor: pointer; transition: background .15s; }
 button.activity-item:hover { background: #fafbf9; }
+.activity-row-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
+.icon-action { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid #e5eae5; border-radius: 8px; background: #fff; color: #5a7662; cursor: pointer; transition: background .15s, border-color .15s; }
+.icon-action:hover { border-color: #cddccf; background: #f1f6f1; }
+.icon-action.delete-action { color: #a45c54; }
+.icon-action.delete-action:hover { border-color: #efd6d3; background: #fff6f5; }
+.icon-action:focus-visible { outline: 3px solid #96baa4; outline-offset: 2px; }
 .activity-open { display: grid; flex: 0 0 19px; width: 19px; height: 19px; place-items: center; border-radius: 5px; color: #7b9282; opacity: .5; transition: opacity .15s, background .15s; }
 button.activity-item:hover .activity-open, button.activity-item:focus-visible .activity-open { background: #edf4ef; opacity: 1; }
 .activity-icon { display: grid; flex: 0 0 32px; width: 32px; height: 32px; place-items: center; border-radius: 9px; background: #f2f5f1; color: #68836f; }
@@ -341,7 +348,8 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 .flow-content .delivery-detail-total { font-size: 14px; }
 .flow-content .delivery-detail-total strong { font-size: 15px; }
 .flow-content .delivery-actions { flex-wrap: wrap; }
-.flow-content .delivery-actions button { min-height: 46px; padding-right: 16px; padding-left: 16px; font-size: 13px; }
+.flow-content .delivery-actions button { width: 48px; min-height: 46px; padding: 0; font-size: 13px; }
+.flow-content .delivery-actions .desktop-action-label { display: none; }
 .flow-content .delete-confirm p { font-size: 14px; }
 .flow-content .danger-button { min-height: 44px; padding: 0 14px; font-size: 13px; }
 
@@ -379,6 +387,7 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .panel-heading h2 { font-size: 21px; }
   .panel-heading p { font-size: 13px; line-height: 1.45; }
   .activity-item { min-height: 72px; gap: 10px; }
+  .activity-row-actions { display: none; }
   .activity-icon { width: 38px; height: 38px; flex-basis: 38px; }
   .activity-copy strong, .activity-meta strong { font-size: 12px; }
   .activity-copy > span, .activity-meta small { max-width: 38vw; font-size: 11px; }
@@ -424,6 +433,7 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .flow-content .delivery-detail-count, .flow-content .delivery-detail-subtotal { font-size: 13px; }
   .flow-content .delivery-actions { display: grid; grid-template-columns: 1fr; }
   .flow-content .delivery-actions button { width: 100%; }
+  .flow-content .delivery-actions .desktop-action-label { display: inline; }
   .flow-content .delete-confirm { display: grid; }
   .flow-content .danger-button, .flow-content .delete-confirm .secondary-button { width: 100%; }
   .toast { bottom: calc(76px + env(safe-area-inset-bottom)); font-size: 13px; }
