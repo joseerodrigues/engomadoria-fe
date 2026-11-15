@@ -50,6 +50,23 @@ function formatMonth(date: string) {
   return `${months[month - 1]} ${date.slice(0, 4)}`;
 }
 
+function shiftMonth(monthKey: string, amount: number) {
+  const [year, month] = monthKey.split("-").map(Number);
+  const shifted = new Date(Date.UTC(year, month - 1 + amount, 1));
+  return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+function getCalendarDays(monthKey: string) {
+  const [year, month] = monthKey.split("-").map(Number);
+  const offset = (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return Array.from({ length: 42 }, (_, index) => {
+    const day = index - offset + 1;
+    if (day < 1 || day > daysInMonth) return null;
+    return { day, date: `${monthKey}-${String(day).padStart(2, "0")}` };
+  });
+}
+
 function pieceCount(delivery: Delivery) {
   return delivery.items.reduce((total, item) => total + item.quantity, 0);
 }
@@ -67,6 +84,8 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const [selectedDropoff, setSelectedDropoff] = useState<Delivery | null>(null);
   const [editingDropoff, setEditingDropoff] = useState<Delivery | null>(null);
   const [deliveryDate, setDeliveryDate] = useState(data.today);
+  const [calendarMonth, setCalendarMonth] = useState(data.today.slice(0, 7));
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [draft, setDraft] = useState<Record<string, number>>({});
   const [period, setPeriod] = useState("6");
@@ -98,6 +117,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const progress = data.monthlyCredits ? Math.min(100, (currentCredits / data.monthlyCredits) * 100) : 0;
   const monthLabel = formatMonth(data.periodStart);
   const initials = data.customerName.split(/\s+/).slice(0, 2).map((part) => part[0]?.toLocaleUpperCase("pt-PT")).join("");
+  const calendarDays = getCalendarDays(calendarMonth);
 
   function addGarment(garment: Garment, amount: number) {
     setDraft((current) => ({ ...current, [garment.id]: Math.min(999, Math.max(0, (current[garment.id] ?? 0) + amount)) }));
@@ -133,6 +153,8 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   function editDropoff(delivery: Delivery) {
     setDraft(Object.fromEntries(delivery.items.map((item) => [item.garmentId, item.quantity])));
     setDeliveryDate(delivery.date);
+    setCalendarMonth(delivery.date.slice(0, 7));
+    setCalendarOpen(false);
     setEditingDropoff(delivery);
     setSelectedDropoff(null);
     setError("");
@@ -143,6 +165,8 @@ export function DashboardClient({ data }: { data: DashboardData }) {
     setDraft({});
     setEditingDropoff(null);
     setDeliveryDate(data.today);
+    setCalendarMonth(data.today.slice(0, 7));
+    setCalendarOpen(false);
     setError("");
     setShowForm(true);
   }
@@ -293,7 +317,17 @@ export function DashboardClient({ data }: { data: DashboardData }) {
       {showForm && <section className="flow-screen" aria-labelledby="usage-title">
         <button className="flow-back" type="button" disabled={pending} onClick={() => { setShowForm(false); setEditingDropoff(null); setError(""); }}><Icon name="arrow" size={18} /> Voltar</button>
         <div className="flow-content"><p className="eyebrow">A SUA CONTA, AO SEU RITMO</p><h1 id="usage-title">{editingDropoff ? "Editar entrega" : "Registar utilização"}</h1><p className="flow-description">Que peças deixou para cuidar {editingDropoff ? "nesta entrega" : "hoje"}?</p>
-          <form onSubmit={saveDropoff} className="flow-form"><label className="delivery-date-field">Data da entrega<input type="date" value={deliveryDate} max={data.today} onChange={(event) => setDeliveryDate(event.target.value)} required /></label><div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={20} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>
+          <form onSubmit={saveDropoff} className="flow-form">
+            <div className="delivery-date-field">
+              <span>Data da entrega</span>
+              <button className="date-picker-value" type="button" aria-expanded={calendarOpen} aria-controls="delivery-calendar" onClick={() => setCalendarOpen((open) => !open)}><Icon name="calendar" size={20} /><span><small>Data selecionada</small><strong>{formatFullDate(deliveryDate)}</strong></span><Icon name="chevron" size={17} /></button>
+              {calendarOpen && <div className="date-calendar" id="delivery-calendar">
+                <div className="date-calendar-heading"><button type="button" className="calendar-month-button previous" aria-label="Mês anterior" onClick={() => setCalendarMonth((month) => shiftMonth(month, -1))}><Icon name="arrow" size={18} /></button><strong>{formatMonth(`${calendarMonth}-01`)}</strong><button type="button" className="calendar-month-button" aria-label="Mês seguinte" disabled={calendarMonth >= data.today.slice(0, 7)} onClick={() => setCalendarMonth((month) => shiftMonth(month, 1))}><Icon name="arrow" size={18} /></button></div>
+                <div className="date-calendar-grid date-calendar-weekdays" aria-hidden="true">{["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map((day) => <span key={day}>{day}</span>)}</div>
+                <div className="date-calendar-grid date-calendar-days">{calendarDays.map((entry, index) => entry ? <button key={entry.date} type="button" disabled={entry.date > data.today} aria-label={formatFullDate(entry.date)} aria-pressed={deliveryDate === entry.date} className={`${deliveryDate === entry.date ? "selected" : ""} ${entry.date === data.today ? "today" : ""}`} onClick={() => { setDeliveryDate(entry.date); setCalendarOpen(false); }}>{entry.day}</button> : <span key={`empty-${calendarMonth}-${index}`} aria-hidden="true" />)}</div>
+              </div>}
+            </div>
+            <div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={20} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>
             {error && <p className="form-error" role="alert">{error}</p>}<div className="modal-summary"><span>Créditos desta entrega</span><strong>{data.garments.reduce((sum, garment) => sum + (draft[garment.id] ?? 0) * garment.slots, 0)}</strong></div><button className="primary-button modal-submit" type="submit" disabled={pending || !Object.values(draft).some((quantity) => quantity > 0)}>{pending ? "A guardar…" : editingDropoff ? "Guardar alterações" : "Guardar utilização"} <Icon name="arrow" size={17} /></button>
           </form>
         </div>
