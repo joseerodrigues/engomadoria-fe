@@ -100,6 +100,13 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const currentCredits = currentDeliveries.reduce((total, delivery) => total + creditCount(delivery), 0);
   const currentPieces = currentDeliveries.reduce((total, delivery) => total + pieceCount(delivery), 0);
   const overPlanLimit = data.monthlyCredits > 0 && currentCredits > data.monthlyCredits;
+  const draftCredits = data.garments.reduce((sum, garment) => sum + (draft[garment.id] ?? 0) * garment.slots, 0);
+  const editingCurrentPeriod = Boolean(editingDropoff && editingDropoff.date >= data.periodStart && editingDropoff.date <= data.periodEnd);
+  const currentCreditsBeforeDraft = currentCredits - (editingCurrentPeriod && editingDropoff ? creditCount(editingDropoff) : 0);
+  const deliveryDateIsCurrentPeriod = deliveryDate >= data.periodStart && deliveryDate <= data.periodEnd;
+  const draftExceedsCurrentPlan = deliveryDateIsCurrentPeriod
+    && data.monthlyCredits > 0
+    && currentCreditsBeforeDraft + draftCredits > data.monthlyCredits;
 
   const categoryStats = useMemo(() => {
     const cutoff = getMonthStart(data.periodStart, Number(period) - 1);
@@ -121,6 +128,11 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
   function addGarment(garment: Garment, amount: number) {
     setDraft((current) => ({ ...current, [garment.id]: Math.min(999, Math.max(0, (current[garment.id] ?? 0) + amount)) }));
+  }
+
+  function canAddGarment(garment: Garment) {
+    if ((draft[garment.id] ?? 0) >= 999 || data.monthlyCredits <= 0) return false;
+    return !deliveryDateIsCurrentPeriod || currentCreditsBeforeDraft + draftCredits + garment.slots <= data.monthlyCredits;
   }
 
   function saveDropoff(event: React.FormEvent<HTMLFormElement>) {
@@ -327,8 +339,8 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                 <div className="date-calendar-grid date-calendar-days">{calendarDays.map((entry, index) => entry ? <button key={entry.date} type="button" disabled={entry.date > data.today} aria-label={formatFullDate(entry.date)} aria-pressed={deliveryDate === entry.date} className={`${deliveryDate === entry.date ? "selected" : ""} ${entry.date === data.today ? "today" : ""}`} onClick={() => { setDeliveryDate(entry.date); setCalendarOpen(false); }}>{entry.day}</button> : <span key={`empty-${calendarMonth}-${index}`} aria-hidden="true" />)}</div>
               </div>}
             </div>
-            <div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={20} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>
-            {error && <p className="form-error" role="alert">{error}</p>}<div className="modal-summary"><span>Créditos desta entrega</span><strong>{data.garments.reduce((sum, garment) => sum + (draft[garment.id] ?? 0) * garment.slots, 0)}</strong></div><button className="primary-button modal-submit" type="submit" disabled={pending || !Object.values(draft).some((quantity) => quantity > 0)}>{pending ? "A guardar…" : editingDropoff ? "Guardar alterações" : "Guardar utilização"} <Icon name="arrow" size={17} /></button>
+            <div className="garment-options">{data.garments.filter((garment) => garment.active || editingDropoff?.items.some((item) => item.garmentId === garment.id)).map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={20} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" disabled={(draft[garment.id] ?? 0) === 0} onClick={() => addGarment(garment, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" disabled={!canAddGarment(garment)} onClick={() => addGarment(garment, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div>
+            {draftExceedsCurrentPlan && <p className="form-error" role="alert">Esta entrega excede os créditos disponíveis neste período. Reduza as quantidades ou mude para um pacote maior.</p>}{error && <p className="form-error" role="alert">{error}</p>}<div className="modal-summary"><span>Créditos desta entrega</span><strong>{draftCredits}</strong></div><button className="primary-button modal-submit" type="submit" disabled={pending || draftCredits <= 0 || draftExceedsCurrentPlan}>{pending ? "A guardar…" : editingDropoff ? "Guardar alterações" : "Guardar utilização"} <Icon name="arrow" size={17} /></button>
           </form>
         </div>
       </section>}

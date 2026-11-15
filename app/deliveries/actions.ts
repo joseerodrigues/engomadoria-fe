@@ -35,7 +35,10 @@ function validateDeliveryDate(deliveredOn: string) {
   return parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === day;
 }
 
-function getRpcError(error: { code?: string } | null, genericMessage: string) {
+function getRpcError(error: { code?: string; message?: string } | null, genericMessage: string) {
+  if (error?.message?.includes("Monthly package credit limit exceeded")) {
+    return "Esta entrega excede os créditos disponíveis no seu pacote. Mude para um pacote com mais créditos para continuar.";
+  }
   if (error?.code === "PGRST202" || error?.code === "42883") {
     return "A base de dados precisa das migrações mais recentes. Execute novamente os ficheiros SQL em supabase/migrations/ no Supabase.";
   }

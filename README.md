@@ -19,7 +19,7 @@ New accounts receive an active Essencial package with 30 monthly credits. Delive
 
 The current SQL migrations can be safely run again against the initialized schema. Migrations that change catalog or configuration data should use deterministic upserts so existing rows can be replaced. Schema changes should preserve customer package and delivery history unless a migration explicitly documents a data replacement. Customers can switch among the configured plans; a change takes effect immediately, while prior package records and deliveries remain in history.
 
-The migration enables row-level security and only grants customers read access to their own records. Delivery creation is performed through a database function that checks the signed-in user, active package, garment catalog, quantities, and current credit values.
+The migration enables row-level security and only grants customers read access to their own records. Delivery create/update functions check the signed-in user, package validity, garment catalog, quantities, current credit values, and monthly credit capacity atomically. A delivery that exceeds the plan limit is rejected; customers can switch to a plan with more credits.
 
 Database triggers audit inserts, updates, and deletes on package plans, garment types, customer packages, deliveries, delivery items, and auth users. Audit rows are not available to customer sessions; service-role access is required. Auth-user snapshots include identifiers and confirmation timestamps only, never passwords or tokens.
 
