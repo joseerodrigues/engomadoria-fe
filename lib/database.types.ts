@@ -37,6 +37,8 @@ export type Database = {
     Views: Record<string, never>;
     Functions: {
       create_delivery: { Args: { p_delivered_on: string; p_items: Json }; Returns: string };
+      update_delivery: { Args: { p_delivery_id: string; p_delivered_on: string; p_items: Json }; Returns: undefined };
+      delete_delivery: { Args: { p_delivery_id: string }; Returns: undefined };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

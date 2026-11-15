@@ -213,6 +213,13 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 .setup-card ol { display: grid; gap: 12px; margin: 0; padding-left: 19px; color: #66736b; font-size: 11px; line-height: 1.6; }
 .setup-card code { padding: 2px 4px; border-radius: 4px; background: #f0f3ef; color: #496a54; font-size: 10px; }
 .setup-card .setup-note { margin: 20px 0 0; padding-top: 14px; border-top: 1px solid #edf0ed; color: #98a19b; font-size: 9px; }
+.delivery-actions, .delete-confirm { display: flex; align-items: center; gap: 14px; margin-top: 17px; padding-top: 14px; border-top: 1px solid #eef0ed; }
+.delete-confirm { flex-wrap: wrap; }
+.delete-confirm p { flex: 1 0 100%; margin: 0; color: #7a655f; font-size: 11px; }
+.danger-button { padding: 7px 10px; border: 1px solid #efd6d3; border-radius: 6px; background: #fff8f7; color: #99544d; font: inherit; font-size: 10px; font-weight: 600; cursor: pointer; }
+.danger-button:disabled { opacity: .5; cursor: wait; }
+.delivery-date-field { display: grid; gap: 7px; margin: 15px 0 8px; color: #657169; font-size: 10px; font-weight: 600; }
+.delivery-date-field input { min-height: 39px; padding: 0 10px; border: 1px solid #e2e8e2; border-radius: 7px; background: #fff; color: #334139; font: inherit; font-weight: 400; }
 
 @media (min-width: 1440px) { .page-content { padding-top: 47px; } }
 @media (max-width: 1120px) {

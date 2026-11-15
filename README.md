@@ -6,7 +6,7 @@ Customer dashboard for managing an ironing package. Customer accounts, package u
 
 1. Create a Supabase project.
 2. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` from the project's Connect panel.
-3. Run [`supabase/migrations/20261115000000_initial_schema.sql`](supabase/migrations/20261115000000_initial_schema.sql) in the Supabase SQL Editor. It creates the package and garment catalog, customer data tables, row-level security policies, and the atomic delivery function.
+3. Run the SQL migrations in `supabase/migrations/` in timestamp order. The initial migration creates the package and garment catalog, customer data tables, row-level security policies, and atomic delivery creation. The delivery edit/delete migration adds the corresponding secure database functions.
 4. In Supabase Auth URL Configuration, allow the local callback `http://localhost:3000/auth/callback`. For phone testing, also allow `http://<computer-lan-ip>:3000/auth/callback`. Add the deployed app's `/auth/callback` URL before production use. Set `NEXT_PUBLIC_SITE_URL` to the deployed origin for email verification and password-reset links.
 5. Start the app:
 
