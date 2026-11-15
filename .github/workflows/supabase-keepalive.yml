@@ -1,0 +1,42 @@
+name: Keep Supabase active
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: true
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Query Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$SUPABASE_URL" || -z "$SUPABASE_SECRET_KEY" ]]; then
+            echo "::error::Set the SUPABASE_URL and SUPABASE_SECRET_KEY repository secrets."
+            exit 1
+          fi
+
+          curl \
+            --silent \
+            --show-error \
+            --fail \
+            --max-time 15 \
+            --output /dev/null \
+            --get "${SUPABASE_URL%/}/rest/v1/package_plans" \
+            --data-urlencode "select=id" \
+            --data-urlencode "limit=1" \
+            --header "apikey: ${SUPABASE_SECRET_KEY}"
