@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { signOutAction } from "@/app/auth/actions";
 import { createDelivery, deleteDelivery, updateDelivery } from "@/app/deliveries/actions";
 import { switchPlan } from "@/app/plans/actions";
@@ -93,7 +92,6 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [draft, setDraft] = useState<Record<string, number>>({});
   const [period, setPeriod] = useState("6");
-  const [activeNav, setActiveNav] = useState("Visão geral");
   const [mobileTab, setMobileTab] = useState<MobileTab>("home");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -226,29 +224,10 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
   return (
     <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || showPlanPicker || showPlanHistory || selectedDropoff ? "true" : "false"}>
-      <aside className="sidebar">
-        <a href="#top" className="brand" aria-label="Roupa em Dia, por Engomadoria Gest, início">
-          <Image className="brand-mark" src="/icon-192-v2.png" alt="" width={32} height={32} priority />
-          <span className="brand-copy"><span className="brand-title">Roupa em Dia</span><small className="brand-provider">por Engomadoria Gest</small></span>
-        </a>
-        <div className="workspace-label">A MINHA CONTA</div>
-        <nav className="main-nav" aria-label="Navegação principal">
-          {[{ label: "Visão geral", icon: "home", href: "#top" }, { label: "O meu pacote", icon: "package", href: "#package" }, { label: "Estatísticas", icon: "chart", href: "#statistics" }].map((item) => (
-            <a key={item.label} href={item.href} onClick={() => setActiveNav(item.label)} aria-current={activeNav === item.label ? "page" : undefined} className={`nav-link ${activeNav === item.label ? "active" : ""}`}>
-              <Icon name={item.icon} size={19} /><span>{item.label}</span>{item.label === "Visão geral" && <span className="nav-dot" />}
-            </a>
-          ))}
-        </nav>
-        <div className="sidebar-bottom">
-          <div className="help-card"><span className="help-icon"><Icon name="sparkle" size={17} /></span><strong>Engomadoria Gest</strong><p>A sua roupa, tratada com todo o carinho.</p><a href="mailto:ola@fioafio.pt">Precisa de ajuda? <Icon name="arrow" size={13} /></a></div>
-          <form action={signOutAction} className="profile-form"><button className="profile-button" type="submit"><span className="avatar">{initials}</span><span className="profile-copy"><b>{data.customerName}</b><small>{data.email}</small></span><span className="signout-label">Sair</span></button></form>
-        </div>
-      </aside>
-
       <section className="main-area" id="top">
         <header className="topbar">
-          <div className="breadcrumbs">A minha conta <span>/</span> <b>{{ home: "Visão geral", deliveries: "Entregas", statistics: "Estatísticas", account: "Conta" }[mobileTab] ?? activeNav}</b></div>
-          <div className="topbar-right"><span className="topbar-message"><span className="status-dot" />Tudo em dia</span><button className="mobile-add-button" onClick={newDropoff} disabled={!data.packageName}><Icon name="plus" size={18} /> Nova entrega</button><span className="mobile-avatar" aria-label={`Perfil ${data.customerName}`}>{initials}</span></div>
+          <div className="breadcrumbs">A minha conta <span>/</span> <b>{{ home: "Visão geral", deliveries: "Entregas", statistics: "Estatísticas", account: "Conta" }[mobileTab]}</b></div>
+          <div className="topbar-right"><span className="topbar-message"><span className="status-dot" />Tudo em dia</span><form action={signOutAction} className="topbar-signout"><span>{data.customerName}</span><button type="submit">Terminar sessão</button></form><button className="mobile-add-button" onClick={newDropoff} disabled={!data.packageName}><Icon name="plus" size={18} /> Nova entrega</button><span className="mobile-avatar" aria-label={`Perfil ${data.customerName}`}>{initials}</span></div>
         </header>
 
         <div className="page-content">
