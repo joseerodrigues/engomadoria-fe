@@ -413,6 +413,15 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 .mobile-tabs { display: none; }
 .mobile-add-button { display: none; }
 .account-panel { display: none; }
+.pwa-install-card { display: flex; align-items: flex-start; gap: 13px; margin: 0 0 18px; padding: 15px; border: 1px solid #e5ebe5; border-radius: 10px; background: #f8faf8; }
+.pwa-install-mark { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 11px; background: #e8f0e9; color: #426f5c; }
+.pwa-install-mark span { font-size: 22px; }
+.pwa-install-content { min-width: 0; }
+.pwa-install-content h3 { margin: 1px 0 5px; color: #354039; font-size: 15px; font-weight: 650; }
+.pwa-install-content p { margin: 0; color: #7c8880; font-size: 13px; line-height: 1.5; }
+.pwa-install-content .pwa-install-help { margin-top: 9px; font-size: 12px; }
+.pwa-install-button { min-height: 42px; margin-top: 11px; padding: 0 13px; border: 1px solid #426f5c; border-radius: 7px; background: #426f5c; color: white; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.pwa-install-button:hover { background: #315943; }
 .inline-notice { display: flex; align-items: center; gap: 8px; margin: 15px auto 0; padding: 11px 13px; border: 1px solid #dce9de; border-radius: 8px; background: #f4f8f4; color: #4e6857; font-size: 13px; }
 .secondary-button { min-height: 42px; padding: 0 14px; border: 1px solid #dfe6df; border-radius: 7px; background: #fff; color: #4f6857; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .flow-screen { position: fixed; z-index: 40; inset: 0; overflow-y: auto; padding: 25px max(24px, calc((100vw - 660px) / 2)) 50px; background: var(--paper); }
@@ -456,7 +465,7 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   body { font-size: 16px; }
   .sidebar { display: none; }
   .main-area { min-height: 100svh; margin: 0; padding: 0 0 calc(78px + env(safe-area-inset-bottom)); }
-  .topbar { height: 58px; padding: 0 17px; }
+  .topbar { height: calc(58px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 17px 0; }
   .breadcrumbs { font-size: 13px; }
   .topbar-message, .mobile-avatar { display: none; }
   .mobile-add-button { display: inline-flex; min-height: 40px; align-items: center; gap: 6px; padding: 0 11px; border: 1px solid #dce8dd; border-radius: 8px; background: #f1f6f1; color: #456c52; font: inherit; font-size: 13px; font-weight: 600; }
@@ -509,6 +518,11 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .account-details h2 { margin: 0 0 4px; font-size: 19px; }
   .account-details p { margin: 3px 0; color: #818c85; font-size: 14px; }
   .account-panel .secondary-button { width: 100%; min-height: 48px; font-size: 14px; }
+  .pwa-install-card { gap: 12px; margin-bottom: 17px; padding: 14px; }
+  .pwa-install-content h3 { font-size: 16px; }
+  .pwa-install-content p { font-size: 14px; }
+  .pwa-install-content .pwa-install-help { font-size: 13px; }
+  .pwa-install-button { min-height: 46px; font-size: 14px; }
   .mobile-tabs { position: fixed; z-index: 8; inset: auto 0 0; display: grid; min-height: calc(66px + env(safe-area-inset-bottom)); grid-template-columns: repeat(4, 1fr); padding: 6px 8px max(6px, env(safe-area-inset-bottom)); border-top: 1px solid #e7ebe7; background: rgb(255 255 255 / 97%); }
   .mobile-tabs button { display: grid; min-height: 52px; align-content: center; justify-items: center; gap: 4px; border: 0; border-radius: 9px; background: transparent; color: #78847c; font: inherit; font-size: 11px; cursor: pointer; }
   .mobile-tabs button.active { background: #edf4ef; color: #3e684e; font-weight: 700; }
@@ -548,4 +562,9 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .toast { bottom: calc(76px + env(safe-area-inset-bottom)); font-size: 13px; }
   .modal-summary { font-size: 13px; }
   .modal-summary strong { font-size: 16px; }
+}
+
+@media (display-mode: standalone) {
+  html, body { min-height: 100%; overscroll-behavior-y: none; }
+  button, a, select { -webkit-tap-highlight-color: transparent; }
 }

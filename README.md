@@ -15,6 +15,8 @@ Customer dashboard for managing an ironing package. Customer accounts, package u
    npm run dev
    ```
 
+The mobile site can be installed as a standalone PWA. In the account tab, Android users can use the install button when their browser offers it; iPhone and iPad users can open the site in Safari, tap Share, then choose “Add to Home Screen”. Production installation requires HTTPS. The app requires an internet connection for account data and changes.
+
 New accounts receive an active Essencial package with 30 monthly credits. Delivery records snapshot garment names and credit values so later catalog changes do not rewrite history. A new account starts with no deliveries.
 
 The current SQL migrations can be safely run again against the initialized schema. Migrations that change catalog or configuration data should use deterministic upserts so existing rows can be replaced. Schema changes should preserve customer package and delivery history unless a migration explicitly documents a data replacement. Customers can switch among the configured plans; a change takes effect immediately, while prior package records and deliveries remain in history. Plan durations are configured in months and begin on the package activation date; packages expire after their configured duration. Customers can review plan history with the saved plan details and each package's activation and expiry dates.

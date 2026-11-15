@@ -1,9 +1,29 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Fio a Fio — O seu cuidado, ao seu ritmo",
   description: "Acompanhe o seu pacote de engomadoria, registe entregas e veja as suas estatísticas.",
+  applicationName: "Fio a Fio",
+  appleWebApp: {
+    capable: true,
+    title: "Fio a Fio",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#fafbf9",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

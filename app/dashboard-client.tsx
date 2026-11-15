@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signOutAction } from "@/app/auth/actions";
 import { createDelivery, deleteDelivery, updateDelivery } from "@/app/deliveries/actions";
 import { switchPlan } from "@/app/plans/actions";
+import { PwaInstall } from "@/components/pwa-install";
 import type { DashboardData, Delivery, Garment } from "@/lib/dashboard-data";
 import { formatFullDate, formatShortDate } from "@/lib/dates";
 
@@ -293,6 +294,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           <section className="panel account-panel">
             <p className="eyebrow">A SUA CONTA</p>
             <div className="account-details"><span className="avatar">{initials}</span><div><h2>{data.customerName}</h2><p>{data.email}</p><p>{data.packageName ?? "Sem pacote ativo"}</p></div></div>
+            <PwaInstall />
             <form action={signOutAction}><button className="secondary-button" type="submit">Terminar sessão</button></form>
           </section>
 
