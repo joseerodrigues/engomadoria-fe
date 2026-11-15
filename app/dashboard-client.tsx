@@ -249,7 +249,6 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
             <article className="stat-card"><div className="stat-card-head"><span className="stat-icon lilac"><Icon name="shirt" size={19} /></span><span className="stat-trend">ESTE MÊS</span></div><strong className="stat-value">{currentPieces}<small> peças</small></strong><p>em {currentDeliveries.length} entregas</p><div className="mini-bars" aria-hidden="true"><i style={{ height: "36%" }} /><i style={{ height: "52%" }} /><i style={{ height: "43%" }} /><i style={{ height: "69%" }} /><i style={{ height: "56%" }} /><i style={{ height: "86%" }} /><i className="bar-active" style={{ height: "72%" }} /></div><div className="stat-caption">Peças cuidadas este mês</div></article>
 
-            <article className="stat-card next-card"><div className="stat-card-head"><span className="stat-icon peach"><Icon name="clock" size={19} /></span><span className="stat-trend">A PRÓXIMA</span></div><strong className="next-date">A sua próxima<br />entrega começa aqui.</strong><p>Registe quando deixar a roupa.</p><button className="text-button" onClick={newDropoff} disabled={!data.packageName}>Adicionar entrega <Icon name="arrow" size={15} /></button></article>
           </section>
 
           <section className="content-grid">

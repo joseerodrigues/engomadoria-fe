@@ -55,7 +55,7 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
 .primary-button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 9px; padding: 0 17px; border: 1px solid var(--green); border-radius: 7px; background: var(--green); color: #fff; font-size: 11px; font-weight: 600; box-shadow: 0 2px 4px #345a4714; cursor: pointer; transition: background .18s, transform .18s; }
 .primary-button:hover:not(:disabled) { transform: translateY(-1px); background: var(--green-dark); }
 .primary-button:disabled { opacity: .48; cursor: not-allowed; }
-.overview-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 14px; }
+.overview-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; }
 .usage-card { min-height: 232px; padding: 20px 22px 16px; border-radius: 11px; background: #496e5d; color: white; box-shadow: 0 5px 16px #314c3a12; }
 .usage-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
 .card-eyebrow { color: #d2dfd7; font-size: 9px; font-weight: 700; letter-spacing: 1.1px; }
@@ -107,8 +107,6 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
 .mini-bars i { flex: 1; min-height: 4px; border-radius: 3px 3px 1px 1px; background: #e9eee9; }
 .mini-bars i.bar-active { background: #799d85; }
 .stat-caption { margin-top: 8px; color: #9da59f; font-size: 9px; }
-.next-date { margin-top: 15px; color: #364239; font-family: Georgia, 'Times New Roman', serif; font-size: 19px; font-weight: 400; letter-spacing: -.25px; line-height: 1.32; }
-.next-card > p { margin-top: -1px; }
 .text-button, .quiet-button { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: #52765f; font-size: 10px; font-weight: 600; cursor: pointer; }
 .text-button { margin-top: auto; padding-top: 11px; }
 .content-grid { display: grid; grid-template-columns: 1.18fr 1fr; gap: 14px; margin-top: 17px; }
@@ -258,7 +256,7 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 @media (max-width: 1120px) {
   .page-content { padding-right: 27px; padding-left: 27px; }
   .topbar { padding-right: 27px; padding-left: 27px; }
-  .overview-grid { grid-template-columns: 1.35fr 1fr 1fr; gap: 10px; }
+  .overview-grid { grid-template-columns: 1.35fr 1fr; gap: 10px; }
   .usage-card { padding-right: 17px; padding-left: 17px; }
   .stat-card { padding-right: 14px; padding-left: 14px; }
   .category-row { grid-template-columns: 24px 70px minmax(28px, 1fr) 18px; gap: 6px; }
@@ -290,7 +288,6 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .stat-trend { font-size: 7px; letter-spacing: .6px; }
   .stat-value { margin-top: 13px; font-size: 28px; }
   .stat-value small { font-size: 11px; }
-  .next-date { margin-top: 15px; font-size: 16px; }
   .stat-card > p { font-size: 9px; line-height: 1.4; }
   .text-button { gap: 4px; font-size: 9px; }
   .content-grid { gap: 10px; margin-top: 10px; }
@@ -452,7 +449,6 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
   .stat-trend { font-size: 10px; }
   .stat-value { font-size: 32px; }
   .stat-value small, .stat-card > p, .stat-caption { font-size: 13px; }
-  .next-date { font-size: 22px; }
   .text-button { font-size: 13px; }
   .content-grid { display: block; margin-top: 0; }
   .content-grid .panel { padding: 19px 15px; }
