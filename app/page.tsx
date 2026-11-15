@@ -178,7 +178,7 @@ export default function Home() {
             </article>
 
             <article className="panel category-panel" id="statistics">
-              <div className="panel-heading category-heading"><div><h2>O que mais cuidamos</h2><p>Peças por categoria</p></div><label className="select-wrap"><span className="sr-only">Período das estatísticas</span><select value={period} onChange={(event) => setPeriod(event.target.value)}>{periodOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select><Icon name="chevron" size={14} /></label></div>
+              <div className="panel-heading category-heading"><div><h2>O que mais cuidamos</h2><p>Peças por categoria</p></div><label className="select-wrap"><span className="sr-only">Período das estatísticas</span><select suppressHydrationWarning value={period} onChange={(event) => setPeriod(event.target.value)}>{periodOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select><Icon name="chevron" size={14} /></label></div>
               <div className="category-chart">{categoryStats.map((item) => <div className="category-row" key={item.id}><span className={`category-symbol symbol-${item.id}`}><Icon name={item.icon} size={16} /></span><span className="category-name">{item.name}</span><span className="category-bar"><i style={{ width: `${(item.count / maxCount) * 100}%` }} /></span><strong className="category-count">{item.count}</strong></div>)}</div>
               <div className="category-note"><span className="note-sparkle"><Icon name="sparkle" size={15} /></span><p><strong>O seu cuidado tem um padrão.</strong> Camisas são a peça mais cuidada neste período.</p></div>
             </article>
