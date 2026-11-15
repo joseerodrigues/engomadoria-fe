@@ -24,6 +24,7 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
     calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></>,
     clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
     check: <><path d="m5 12 4 4L19 6"/></>,
+    warning: <><path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3l-8.1-14.1a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></>,
     close: <><path d="m18 6-12 12M6 6l12 12"/></>,
     shirt: <><path d="m8 4 4 2 4-2 5 3-3 4-2-1v10H8V10l-2 1-3-4 5-3Z"/></>,
     trousers: <><path d="M7 3h10l1 18h-5l-1-8-1 8H6L7 3Z"/><path d="M7 7h10"/></>,
@@ -76,6 +77,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const currentDeliveries = dropoffs.filter((delivery) => delivery.date >= data.periodStart && delivery.date <= data.periodEnd);
   const currentCredits = currentDeliveries.reduce((total, delivery) => total + creditCount(delivery), 0);
   const currentPieces = currentDeliveries.reduce((total, delivery) => total + pieceCount(delivery), 0);
+  const overPlanLimit = data.monthlyCredits > 0 && currentCredits > data.monthlyCredits;
 
   const categoryStats = useMemo(() => {
     const cutoff = getMonthStart(data.periodStart, Number(period) - 1);
@@ -199,11 +201,12 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           </section>
 
           <section className="overview-grid" aria-label="Resumo do pacote">
-            <article className="usage-card" id="package">
+            <article className={`usage-card ${overPlanLimit ? "usage-over-limit" : ""}`} id="package">
               <div className="usage-card-top"><div><span className="card-eyebrow light">O MEU PACOTE <span className="current-pill">{data.packageName ? "ATIVO" : "SEM PACOTE"}</span></span><h2>{data.packageName ?? "Pacote por atribuir"}</h2><p>{data.packageName ? "O seu ritmo, ao seu cuidado." : "Contacte-nos para ativar o seu pacote."}</p></div><div className="package-icon"><Icon name="package" size={24} /></div></div>
               <div className="usage-divider" />
-              <div className="usage-numbers"><div><strong>{currentCredits}<span> / {data.monthlyCredits}</span></strong><small>créditos utilizados</small></div><div className="remaining"><strong>{Math.max(0, data.monthlyCredits - currentCredits)}</strong><small>créditos disponíveis</small></div></div>
+              <div className="usage-numbers"><div><strong className={overPlanLimit ? "credit-over-limit" : ""}>{currentCredits}<span> / {data.monthlyCredits}</span></strong><small>créditos utilizados</small></div><div className="remaining"><strong>{Math.max(0, data.monthlyCredits - currentCredits)}</strong><small>créditos disponíveis</small></div></div>
               <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
+              {overPlanLimit && <p className="usage-warning" role="alert"><Icon name="warning" size={17} /> Excedeu o limite do pacote em {currentCredits - data.monthlyCredits} créditos.</p>}
               <div className="usage-foot"><span><Icon name="calendar" size={14} /> {formatShortDate(data.periodStart)} – {formatShortDate(data.periodEnd)} {data.periodEnd.slice(0, 4)}</span><span>{Math.round(progress)}% utilizado</span></div>
             </article>
 

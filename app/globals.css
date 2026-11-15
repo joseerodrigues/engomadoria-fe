@@ -86,6 +86,10 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
 .usage-numbers .remaining strong { font-size: 17px; }
 .progress-track { height: 5px; overflow: hidden; margin: 12px 0 10px; border-radius: 5px; background: #ffffff38; }
 .progress-track span { display: block; height: 100%; border-radius: inherit; background: #e7d3a8; transition: width .3s; }
+.usage-over-limit .credit-over-limit { color: #ffd2cb; }
+.usage-over-limit .progress-track span { background: #f0a49a; }
+.usage-warning { display: flex; align-items: flex-start; gap: 7px; margin: 10px 0 0; padding: 8px 9px; border-radius: 6px; background: #fff0ee; color: #8e4038; font-size: 12px; font-weight: 600; line-height: 1.4; }
+.usage-warning svg { flex: 0 0 auto; margin-top: 1px; }
 .usage-foot { display: flex; justify-content: space-between; color: #d6e1d9; font-size: 9px; }
 .usage-foot span:first-child { display: flex; align-items: center; gap: 5px; }
 .stat-card { position: relative; display: flex; min-height: 232px; flex-direction: column; overflow: hidden; padding: 19px 18px 15px; border: 1px solid #e9ece8; border-radius: 11px; background: #fff; }
