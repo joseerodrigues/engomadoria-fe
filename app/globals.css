@@ -65,7 +65,8 @@ button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid
 .eyebrow svg { color: #ba9a5b; }
 h1, h2, p { margin-top: 0; }
 h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(29px, 3vw, 36px); font-weight: 400; letter-spacing: -1.15px; line-height: 1.1; }
-.wave { display: inline-block; padding-left: 8px; color: #c3a263; font-family: Arial, sans-serif; font-size: 17px; vertical-align: top; }
+.wave { display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; padding-left: 7px; color: #c3a263; vertical-align: 3px; }
+.wave svg { width: 16px; height: 16px; }
 .welcome-subtitle { margin-bottom: 0; color: #8a938e; font-size: 12px; }
 .primary-button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 9px; padding: 0 17px; border: 1px solid var(--green); border-radius: 7px; background: var(--green); color: #fff; font-size: 11px; font-weight: 600; box-shadow: 0 2px 4px #345a4714; cursor: pointer; transition: background .18s, transform .18s; }
 .primary-button:hover:not(:disabled) { transform: translateY(-1px); background: var(--green-dark); }
@@ -417,7 +418,7 @@ button.activity-item:hover .activity-open, button.activity-item:focus-visible .a
 .account-panel { display: none; }
 .pwa-install-card { display: flex; align-items: flex-start; gap: 13px; margin: 0 0 18px; padding: 15px; border: 1px solid #e5ebe5; border-radius: 10px; background: #f8faf8; }
 .pwa-install-mark { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 11px; background: #e8f0e9; color: #426f5c; }
-.pwa-install-mark span { font-size: 22px; }
+.pwa-install-mark svg { width: 22px; height: 22px; }
 .pwa-install-content { min-width: 0; }
 .pwa-install-content h3 { margin: 1px 0 5px; color: #354039; font-size: 15px; font-weight: 650; }
 .pwa-install-content p { margin: 0; color: #7c8880; font-size: 13px; line-height: 1.5; }

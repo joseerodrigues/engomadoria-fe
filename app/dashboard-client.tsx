@@ -7,6 +7,7 @@ import { signOutAction } from "@/app/auth/actions";
 import { createDelivery, deleteDelivery, updateDelivery } from "@/app/deliveries/actions";
 import { switchPlan } from "@/app/plans/actions";
 import { PwaInstall } from "@/components/pwa-install";
+import { SparkleMark } from "@/components/sparkle-mark";
 import type { DashboardData, Delivery, Garment } from "@/lib/dashboard-data";
 import { formatFullDate, formatShortDate } from "@/lib/dates";
 
@@ -253,7 +254,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
         <div className="page-content">
           {notice && <p className="inline-notice" role="status"><Icon name="check" size={17} />{notice}</p>}
           <section className="welcome-row">
-            <div><p className="eyebrow"><Icon name="sun" size={15} /> O SEU MÊS DE {monthLabel.split(" ")[0].toLocaleUpperCase("pt-PT")}</p><h1>Bom dia, {data.customerName.split(" ")[0]}<span className="wave">✳</span></h1><p className="welcome-subtitle">A sua roupa está em boas mãos. Veja como vai o seu mês.</p></div>
+            <div><p className="eyebrow"><Icon name="sun" size={15} /> O SEU MÊS DE {monthLabel.split(" ")[0].toLocaleUpperCase("pt-PT")}</p><h1>Bom dia, {data.customerName.split(" ")[0]}<span className="wave"><SparkleMark /></span></h1><p className="welcome-subtitle">A sua roupa está em boas mãos. Veja como vai o seu mês.</p></div>
             <button className="primary-button" onClick={newDropoff} disabled={!data.packageName}><Icon name="plus" size={18} />Registar utilização</button>
           </section>
 

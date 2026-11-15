@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { SparkleMark } from "@/components/sparkle-mark";
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -58,7 +59,7 @@ export function PwaInstall() {
 
   return (
     <section className="pwa-install-card" aria-labelledby="pwa-install-title">
-      <div className="pwa-install-mark" aria-hidden="true"><span>✳</span></div>
+      <div className="pwa-install-mark"><SparkleMark /></div>
       <div className="pwa-install-content">
         <h3 id="pwa-install-title">Leve a Roupa em Dia consigo</h3>
         <p>Adicione a aplicação ao ecrã principal para a abrir numa janela própria.</p>

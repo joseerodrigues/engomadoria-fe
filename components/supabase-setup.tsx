@@ -1,8 +1,10 @@
+import Image from "next/image";
+
 export function SupabaseSetup() {
   return (
     <main className="setup-shell">
       <div className="setup-card">
-        <span className="brand-mark"><span aria-hidden="true">✳</span></span>
+        <Image className="brand-mark" src="/icon-192-v2.png" alt="" width={32} height={32} priority />
         <p className="eyebrow">CONFIGURAÇÃO INICIAL</p>
         <h1>Ligue a sua base de dados.</h1>
         <p>Para guardar contas e entregas, configure um projeto Supabase:</p>
