@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { signOutAction } from "@/app/auth/actions";
 import { createDelivery, deleteDelivery, updateDelivery } from "@/app/deliveries/actions";
+import { switchPlan } from "@/app/plans/actions";
 import type { DashboardData, Delivery, Garment } from "@/lib/dashboard-data";
 import { formatFullDate, formatShortDate } from "@/lib/dates";
 
@@ -61,6 +62,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const router = useRouter();
   const dropoffs = data.deliveries;
   const [showForm, setShowForm] = useState(false);
+  const [showPlanPicker, setShowPlanPicker] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [selectedDropoff, setSelectedDropoff] = useState<Delivery | null>(null);
   const [editingDropoff, setEditingDropoff] = useState<Delivery | null>(null);
@@ -72,6 +74,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
   const [mobileTab, setMobileTab] = useState<MobileTab>("home");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [planError, setPlanError] = useState("");
   const [pending, startTransition] = useTransition();
 
   const currentDeliveries = dropoffs.filter((delivery) => delivery.date >= data.periodStart && delivery.date <= data.periodEnd);
@@ -166,8 +169,23 @@ export function DashboardClient({ data }: { data: DashboardData }) {
     setError("");
   }
 
+  function choosePlan(planId: string) {
+    setPlanError("");
+    startTransition(async () => {
+      const result = await switchPlan(planId);
+      if (result.error) {
+        setPlanError(result.error);
+        return;
+      }
+      setShowPlanPicker(false);
+      setNotice("O seu pacote foi atualizado");
+      window.setTimeout(() => setNotice(""), 3200);
+      router.refresh();
+    });
+  }
+
   return (
-    <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || selectedDropoff ? "true" : "false"}>
+    <main className="app-shell" data-mobile-tab={mobileTab} data-flow={showForm || showPlanPicker || selectedDropoff ? "true" : "false"}>
       <aside className="sidebar">
         <a href="#top" className="brand" aria-label="Fio a Fio, início">
           <span className="brand-mark"><Icon name="sparkle" size={20} /></span>
@@ -202,7 +220,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
           <section className="overview-grid" aria-label="Resumo do pacote">
             <article className={`usage-card ${overPlanLimit ? "usage-over-limit" : ""}`} id="package">
-              <div className="usage-card-top"><div><span className="card-eyebrow light">O MEU PACOTE <span className="current-pill">{data.packageName ? "ATIVO" : "SEM PACOTE"}</span></span><h2>{data.packageName ?? "Pacote por atribuir"}</h2><p>{data.packageName ? "O seu ritmo, ao seu cuidado." : "Contacte-nos para ativar o seu pacote."}</p></div><div className="package-icon"><Icon name="package" size={24} /></div></div>
+              <div className="usage-card-top"><div><span className="card-eyebrow light">O MEU PACOTE <span className="current-pill">{data.packageName ? "ATIVO" : "SEM PACOTE"}</span></span><h2>{data.packageName ?? "Pacote por atribuir"}</h2><p>{data.packageName ? "O seu ritmo, ao seu cuidado." : "Escolha um pacote para começar."}</p><button className="plan-change-button" type="button" onClick={() => { setPlanError(""); setShowPlanPicker(true); }}>Mudar pacote <Icon name="arrow" size={15} /></button></div><div className="package-icon"><Icon name="package" size={24} /></div></div>
               <div className="usage-divider" />
               <div className="usage-numbers"><div><strong className={overPlanLimit ? "credit-over-limit" : ""}>{currentCredits}<span> / {data.monthlyCredits}</span></strong><small>créditos utilizados</small></div><div className="remaining"><strong>{Math.max(0, data.monthlyCredits - currentCredits)}</strong><small>créditos disponíveis</small></div></div>
               <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
@@ -258,6 +276,17 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           <div className="delivery-detail-total"><span>{pieceCount(selectedDropoff)} peças entregues</span><strong>{creditCount(selectedDropoff)} créditos</strong></div>
           {error && <p className="form-error" role="alert">{error}</p>}
           {confirmDelete ? <div className="delete-confirm"><p>Eliminar esta entrega e todas as peças registadas?</p><button className="secondary-button" type="button" onClick={() => setConfirmDelete(false)}>Cancelar</button><button className="danger-button" type="button" disabled={pending} onClick={() => removeDropoff(selectedDropoff)}>{pending ? "A eliminar…" : "Confirmar eliminação"}</button></div> : <div className="delivery-actions"><button className="primary-button" type="button" onClick={() => editDropoff(selectedDropoff)} aria-label="Editar entrega" title="Editar entrega"><Icon name="edit" size={18} /><span className="desktop-action-label">Editar entrega</span></button><button className="danger-button" type="button" onClick={() => setConfirmDelete(true)} aria-label="Eliminar entrega" title="Eliminar entrega"><Icon name="trash" size={18} /><span className="desktop-action-label">Eliminar entrega</span></button></div>}
+        </div>
+      </section>}
+
+      {showPlanPicker && <section className="flow-screen" aria-labelledby="plan-title">
+        <button className="flow-back" type="button" disabled={pending} onClick={() => setShowPlanPicker(false)}><Icon name="arrow" size={18} /> Voltar ao pacote</button>
+        <div className="flow-content"><p className="eyebrow">O SEU PACOTE</p><h1 id="plan-title">Escolha o seu ritmo</h1><p className="flow-description">A alteração entra em vigor hoje. As entregas já registadas neste mês continuam a contar para o limite do novo pacote.</p>
+          {planError && <p className="form-error" role="alert">{planError}</p>}
+          <div className="plan-options">{data.plans.filter((plan) => plan.active).map((plan) => {
+            const current = plan.id === data.currentPlanId;
+            return <button className={`plan-option ${current ? "current" : ""}`} key={plan.id} type="button" disabled={pending || current} aria-pressed={current} onClick={() => choosePlan(plan.id)}><span className="plan-option-copy"><strong>{plan.name}</strong><small>{plan.monthlyCredits} créditos por mês</small></span><span className="plan-option-action">{current ? "Pacote atual" : pending ? "A atualizar…" : "Escolher"}</span></button>;
+          })}</div>
         </div>
       </section>}
 

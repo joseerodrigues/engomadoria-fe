@@ -10,6 +10,13 @@ export type Garment = {
   active: boolean;
 };
 
+export type PackagePlan = {
+  id: string;
+  name: string;
+  monthlyCredits: number;
+  active: boolean;
+};
+
 export type DeliveryItem = {
   garmentId: string;
   name: string;
@@ -28,6 +35,8 @@ export type DashboardData = {
   email: string;
   today: string;
   packageName: string | null;
+  currentPlanId: string | null;
+  plans: PackagePlan[];
   monthlyCredits: number;
   periodStart: string;
   periodEnd: string;
@@ -53,14 +62,19 @@ export async function loadDashboardData(
   if (packageError) throw new Error("Não foi possível carregar o seu pacote.");
 
   const customerPackage = customerPackages?.[0];
-  const [{ data: garmentRows, error: garmentsError }, { data: plan, error: planError }] = await Promise.all([
+  const [{ data: garmentRows, error: garmentsError }, { data: planRows, error: plansError }] = await Promise.all([
     supabase.from("garment_types").select("id, name_pt, singular_pt, credits_per_piece, icon, is_active").order("name_pt"),
-    customerPackage
-      ? supabase.from("package_plans").select("name_pt, monthly_credits").eq("id", customerPackage.plan_id).maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
+    supabase.from("package_plans").select("id, name_pt, monthly_credits, is_active").order("monthly_credits"),
   ]);
 
-  if (garmentsError || planError) throw new Error("Não foi possível carregar os dados do pacote.");
+  if (garmentsError || plansError) throw new Error("Não foi possível carregar os dados do pacote.");
+  const plans: PackagePlan[] = (planRows ?? []).map((plan) => ({
+    id: plan.id,
+    name: plan.name_pt,
+    monthlyCredits: plan.monthly_credits,
+    active: plan.is_active,
+  }));
+  const currentPlan = plans.find((plan) => plan.id === customerPackage?.plan_id);
 
   const garments: Garment[] = (garmentRows ?? []).map((garment) => ({
     id: garment.id,
@@ -115,8 +129,10 @@ export async function loadDashboardData(
     customerName: typeof name === "string" && name.trim() ? name.trim() : user.email?.split("@")[0] ?? "Cliente",
     email: user.email ?? "",
     today,
-    packageName: plan?.name_pt ?? null,
-    monthlyCredits: plan?.monthly_credits ?? 0,
+    packageName: currentPlan?.name ?? null,
+    currentPlanId: currentPlan?.id ?? null,
+    plans,
+    monthlyCredits: currentPlan?.monthlyCredits ?? 0,
     periodStart,
     periodEnd,
     garments,

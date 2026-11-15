@@ -39,6 +39,7 @@ export type Database = {
       create_delivery: { Args: { p_delivered_on: string; p_items: Json }; Returns: string };
       update_delivery: { Args: { p_delivery_id: string; p_delivered_on: string; p_items: Json }; Returns: undefined };
       delete_delivery: { Args: { p_delivery_id: string }; Returns: undefined };
+      switch_customer_plan: { Args: { p_plan_id: string }; Returns: string };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
