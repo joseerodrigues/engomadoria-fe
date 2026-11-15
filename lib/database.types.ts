@@ -4,9 +4,9 @@ export type Database = {
   public: {
     Tables: {
       package_plans: {
-        Row: { id: string; name_pt: string; monthly_credits: number; is_active: boolean };
-        Insert: { id: string; name_pt: string; monthly_credits: number; is_active?: boolean };
-        Update: { id?: string; name_pt?: string; monthly_credits?: number; is_active?: boolean };
+        Row: { id: string; name_pt: string; monthly_credits: number; duration_months: number; is_active: boolean };
+        Insert: { id: string; name_pt: string; monthly_credits: number; duration_months?: number; is_active?: boolean };
+        Update: { id?: string; name_pt?: string; monthly_credits?: number; duration_months?: number; is_active?: boolean };
         Relationships: [];
       };
       garment_types: {
@@ -55,9 +55,9 @@ export type Database = {
         Relationships: [];
       };
       customer_packages: {
-        Row: { id: string; customer_id: string; plan_id: string; valid_from: string; valid_until: string | null; status: "active" | "ended" };
-        Insert: { id?: string; customer_id: string; plan_id: string; valid_from?: string; valid_until?: string | null; status?: "active" | "ended" };
-        Update: { id?: string; customer_id?: string; plan_id?: string; valid_from?: string; valid_until?: string | null; status?: "active" | "ended" };
+        Row: { id: string; customer_id: string; plan_id: string; plan_name_snapshot: string; monthly_credits_snapshot: number; duration_months_snapshot: number; valid_from: string; valid_until: string | null; status: "active" | "ended" };
+        Insert: { id?: string; customer_id: string; plan_id: string; plan_name_snapshot: string; monthly_credits_snapshot: number; duration_months_snapshot: number; valid_from?: string; valid_until?: string | null; status?: "active" | "ended" };
+        Update: { id?: string; customer_id?: string; plan_id?: string; plan_name_snapshot?: string; monthly_credits_snapshot?: number; duration_months_snapshot?: number; valid_from?: string; valid_until?: string | null; status?: "active" | "ended" };
         Relationships: [];
       };
       deliveries: {

@@ -6,7 +6,7 @@ Customer dashboard for managing an ironing package. Customer accounts, package u
 
 1. Create a Supabase project.
 2. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` from the project's Connect panel.
-3. Run the SQL migrations in `supabase/migrations/` in timestamp order. They create the package and garment catalog, customer data tables, row-level security policies, atomic delivery operations, package switching, and audit logging.
+3. Run the SQL migrations in `supabase/migrations/` in timestamp order. They create the package and garment catalog, customer data tables, row-level security policies, atomic delivery operations, package switching and expiry, and audit logging.
 4. In Supabase Auth URL Configuration, allow the local callback `http://localhost:3000/auth/callback`. For phone testing, also allow `http://<computer-lan-ip>:3000/auth/callback`. Add the deployed app's `/auth/callback` URL before production use. Set `NEXT_PUBLIC_SITE_URL` to the deployed origin for email verification and password-reset links.
 5. Start the app:
 
@@ -17,7 +17,7 @@ Customer dashboard for managing an ironing package. Customer accounts, package u
 
 New accounts receive an active Essencial package with 30 monthly credits. Delivery records snapshot garment names and credit values so later catalog changes do not rewrite history. A new account starts with no deliveries.
 
-The current SQL migrations can be safely run again against the initialized schema. Migrations that change catalog or configuration data should use deterministic upserts so existing rows can be replaced. Schema changes should preserve customer package and delivery history unless a migration explicitly documents a data replacement. Customers can switch among the configured plans; a change takes effect immediately, while prior package records and deliveries remain in history.
+The current SQL migrations can be safely run again against the initialized schema. Migrations that change catalog or configuration data should use deterministic upserts so existing rows can be replaced. Schema changes should preserve customer package and delivery history unless a migration explicitly documents a data replacement. Customers can switch among the configured plans; a change takes effect immediately, while prior package records and deliveries remain in history. Plan durations are configured in months and begin on the package activation date; packages expire after their configured duration.
 
 The migration enables row-level security and only grants customers read access to their own records. Delivery create/update functions check the signed-in user, package validity, garment catalog, quantities, current credit values, and monthly credit capacity atomically. A delivery that exceeds the plan limit is rejected; customers can switch to a plan with more credits.
 

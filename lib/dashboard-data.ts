@@ -14,6 +14,7 @@ export type PackagePlan = {
   id: string;
   name: string;
   monthlyCredits: number;
+  durationMonths: number;
   active: boolean;
 };
 
@@ -37,6 +38,8 @@ export type DashboardData = {
   packageName: string | null;
   currentPlanId: string | null;
   plans: PackagePlan[];
+  packageStartedOn: string | null;
+  packageExpiresOn: string | null;
   monthlyCredits: number;
   periodStart: string;
   periodEnd: string;
@@ -51,7 +54,7 @@ export async function loadDashboardData(
 ): Promise<DashboardData> {
   const { data: customerPackages, error: packageError } = await supabase
     .from("customer_packages")
-    .select("id, plan_id, valid_from")
+    .select("id, plan_id, valid_from, valid_until")
     .eq("customer_id", user.id)
     .eq("status", "active")
     .lte("valid_from", today)
@@ -64,7 +67,7 @@ export async function loadDashboardData(
   const customerPackage = customerPackages?.[0];
   const [{ data: garmentRows, error: garmentsError }, { data: planRows, error: plansError }] = await Promise.all([
     supabase.from("garment_types").select("id, name_pt, singular_pt, credits_per_piece, icon, is_active").order("name_pt"),
-    supabase.from("package_plans").select("id, name_pt, monthly_credits, is_active").order("monthly_credits"),
+    supabase.from("package_plans").select("id, name_pt, monthly_credits, duration_months, is_active").order("monthly_credits"),
   ]);
 
   if (garmentsError || plansError) throw new Error("Não foi possível carregar os dados do pacote.");
@@ -72,6 +75,7 @@ export async function loadDashboardData(
     id: plan.id,
     name: plan.name_pt,
     monthlyCredits: plan.monthly_credits,
+    durationMonths: plan.duration_months,
     active: plan.is_active,
   }));
   const currentPlan = plans.find((plan) => plan.id === customerPackage?.plan_id);
@@ -132,6 +136,8 @@ export async function loadDashboardData(
     packageName: currentPlan?.name ?? null,
     currentPlanId: currentPlan?.id ?? null,
     plans,
+    packageStartedOn: customerPackage?.valid_from ?? null,
+    packageExpiresOn: customerPackage?.valid_until ?? null,
     monthlyCredits: currentPlan?.monthlyCredits ?? 0,
     periodStart,
     periodEnd,

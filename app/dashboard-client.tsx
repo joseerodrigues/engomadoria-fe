@@ -256,7 +256,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
           <section className="overview-grid" aria-label="Resumo do pacote">
             <article className={`usage-card ${overPlanLimit ? "usage-over-limit" : ""}`} id="package">
-              <div className="usage-card-top"><div><span className="card-eyebrow light">O MEU PACOTE <span className="current-pill">{data.packageName ? "ATIVO" : "SEM PACOTE"}</span></span><h2>{data.packageName ?? "Pacote por atribuir"}</h2><p>{data.packageName ? "O seu ritmo, ao seu cuidado." : "Escolha um pacote para começar."}</p><button className="plan-change-button" type="button" onClick={() => { setPlanError(""); setShowPlanPicker(true); }}>Mudar pacote <Icon name="arrow" size={15} /></button></div><div className="package-icon"><Icon name="package" size={24} /></div></div>
+              <div className="usage-card-top"><div><span className="card-eyebrow light">O MEU PACOTE <span className="current-pill">{data.packageName ? "ATIVO" : "SEM PACOTE"}</span></span><h2>{data.packageName ?? "Pacote por atribuir"}</h2><p>{data.packageName ? "O seu ritmo, ao seu cuidado." : "Escolha um pacote para começar."}</p>{data.packageStartedOn && <p className="package-validity">Ativo desde {formatShortDate(data.packageStartedOn)} · expira {data.packageExpiresOn ? formatShortDate(data.packageExpiresOn) : "sem data definida"} {data.packageExpiresOn?.slice(0, 4)}</p>}<button className="plan-change-button" type="button" onClick={() => { setPlanError(""); setShowPlanPicker(true); }}>{data.packageName ? "Mudar pacote" : "Escolher pacote"} <Icon name="arrow" size={15} /></button></div><div className="package-icon"><Icon name="package" size={24} /></div></div>
               <div className="usage-divider" />
               <div className="usage-numbers"><div><strong className={overPlanLimit ? "credit-over-limit" : ""}>{currentCredits}<span> / {data.monthlyCredits}</span></strong><small>créditos utilizados</small></div><div className="remaining"><strong>{Math.max(0, data.monthlyCredits - currentCredits)}</strong><small>créditos disponíveis</small></div></div>
               <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
@@ -321,7 +321,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           {planError && <p className="form-error" role="alert">{planError}</p>}
           <div className="plan-options">{data.plans.filter((plan) => plan.active).map((plan) => {
             const current = plan.id === data.currentPlanId;
-            return <button className={`plan-option ${current ? "current" : ""}`} key={plan.id} type="button" disabled={pending || current} aria-pressed={current} onClick={() => choosePlan(plan.id)}><span className="plan-option-copy"><strong>{plan.name}</strong><small>{plan.monthlyCredits} créditos por mês</small></span><span className="plan-option-action">{current ? "Pacote atual" : pending ? "A atualizar…" : "Escolher"}</span></button>;
+            return <button className={`plan-option ${current ? "current" : ""}`} key={plan.id} type="button" disabled={pending || current} aria-pressed={current} onClick={() => choosePlan(plan.id)}><span className="plan-option-copy"><strong>{plan.name}</strong><small>{plan.monthlyCredits} créditos por mês · {plan.durationMonths} {plan.durationMonths === 1 ? "mês" : "meses"}</small></span><span className="plan-option-action">{current ? "Pacote atual" : pending ? "A atualizar…" : "Escolher"}</span></button>;
           })}</div>
         </div>
       </section>}

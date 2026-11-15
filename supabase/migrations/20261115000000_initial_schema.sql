@@ -2,8 +2,12 @@ create table if not exists public.package_plans (
   id text primary key,
   name_pt text not null,
   monthly_credits integer not null check (monthly_credits > 0),
+  duration_months integer not null default 1 check (duration_months > 0),
   is_active boolean not null default true
 );
+
+alter table public.package_plans
+  add column if not exists duration_months integer not null default 1;
 
 create table if not exists public.garment_types (
   id text primary key,
@@ -18,11 +22,19 @@ create table if not exists public.customer_packages (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid not null references auth.users (id) on delete cascade,
   plan_id text not null references public.package_plans (id),
+  plan_name_snapshot text not null,
+  monthly_credits_snapshot integer not null check (monthly_credits_snapshot > 0),
+  duration_months_snapshot integer not null check (duration_months_snapshot > 0),
   valid_from date not null default current_date,
   valid_until date,
   status text not null default 'active' check (status in ('active', 'ended')),
   check (valid_until is null or valid_until >= valid_from)
 );
+
+alter table public.customer_packages
+  add column if not exists plan_name_snapshot text,
+  add column if not exists monthly_credits_snapshot integer,
+  add column if not exists duration_months_snapshot integer;
 
 create unique index if not exists customer_packages_one_active_idx
   on public.customer_packages (customer_id)
@@ -72,19 +84,43 @@ on conflict (id) do update set
   icon = excluded.icon,
   is_active = true;
 
+update public.customer_packages as cp
+set plan_name_snapshot = coalesce(cp.plan_name_snapshot, pp.name_pt),
+    monthly_credits_snapshot = coalesce(cp.monthly_credits_snapshot, pp.monthly_credits),
+    duration_months_snapshot = coalesce(cp.duration_months_snapshot, pp.duration_months),
+    valid_until = coalesce(
+      cp.valid_until,
+      (cp.valid_from + pg_catalog.make_interval(months => pp.duration_months))::date
+    )
+from public.package_plans as pp
+where pp.id = cp.plan_id;
+
+alter table public.customer_packages
+  alter column plan_name_snapshot set not null,
+  alter column monthly_credits_snapshot set not null,
+  alter column duration_months_snapshot set not null;
+
 create or replace function public.create_customer_package_for_new_user()
 returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  v_plan public.package_plans%rowtype;
+  v_started_on date := timezone('Europe/Lisbon', now())::date;
 begin
-  insert into public.customer_packages (customer_id, plan_id, valid_from, status)
-  values (
-    new.id,
-    'essential-30',
-    date_trunc('month', timezone('Europe/Lisbon', now()))::date,
-    'active'
+  select * into v_plan from public.package_plans where id = 'essential-30' and is_active;
+  if not found then
+    raise exception 'Default package plan is unavailable';
+  end if;
+
+  insert into public.customer_packages (
+    customer_id, plan_id, plan_name_snapshot, monthly_credits_snapshot, duration_months_snapshot,
+    valid_from, valid_until, status
+  ) values (
+    new.id, v_plan.id, v_plan.name_pt, v_plan.monthly_credits, v_plan.duration_months,
+    v_started_on, (v_started_on + pg_catalog.make_interval(months => v_plan.duration_months))::date, 'active'
   );
   return new;
 end;

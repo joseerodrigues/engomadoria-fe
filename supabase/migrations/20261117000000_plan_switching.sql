@@ -1,11 +1,12 @@
-insert into public.package_plans (id, name_pt, monthly_credits, is_active)
+insert into public.package_plans (id, name_pt, monthly_credits, duration_months, is_active)
 values
-  ('essential-30', 'Essencial', 30, true),
-  ('comfort-60', 'Conforto', 60, true),
-  ('family-90', 'Família', 90, true)
+  ('essential-30', 'Essencial', 30, 1, true),
+  ('comfort-60', 'Conforto', 60, 1, true),
+  ('family-90', 'Família', 90, 1, true)
 on conflict (id) do update set
   name_pt = excluded.name_pt,
   monthly_credits = excluded.monthly_credits,
+  duration_months = excluded.duration_months,
   is_active = excluded.is_active;
 
 create or replace function public.switch_customer_plan(p_plan_id text)
@@ -17,10 +18,12 @@ as $$
 declare
   v_user_id uuid := auth.uid();
   v_today date := timezone('Europe/Lisbon', now())::date;
-  v_period_start date := date_trunc('month', timezone('Europe/Lisbon', now()))::date;
   v_package_id uuid;
   v_current_plan_id text;
   v_new_package_id uuid;
+  v_plan_name text;
+  v_monthly_credits integer;
+  v_duration_months integer;
 begin
   if v_user_id is null then
     raise exception 'Authentication required';
@@ -30,9 +33,18 @@ begin
     raise exception 'Package plan is invalid';
   end if;
 
-  if not exists (select 1 from public.package_plans where id = p_plan_id and is_active) then
+  select pp.name_pt, pp.monthly_credits, pp.duration_months
+  into v_plan_name, v_monthly_credits, v_duration_months
+  from public.package_plans as pp
+  where pp.id = p_plan_id and pp.is_active;
+
+  if not found then
     raise exception 'Package plan is unavailable';
   end if;
+
+  update public.customer_packages
+  set status = 'ended'
+  where customer_id = v_user_id and status = 'active' and valid_until < v_today;
 
   select cp.id, cp.plan_id
   into v_package_id, v_current_plan_id
@@ -53,12 +65,15 @@ begin
     update public.customer_packages
     set status = 'ended', valid_until = v_today
     where id = v_package_id and customer_id = v_user_id;
-  else
-    v_period_start := date_trunc('month', timezone('Europe/Lisbon', now()))::date;
   end if;
 
-  insert into public.customer_packages (customer_id, plan_id, valid_from, status)
-  values (v_user_id, p_plan_id, case when v_package_id is null then v_period_start else v_today end, 'active')
+  insert into public.customer_packages (
+    customer_id, plan_id, plan_name_snapshot, monthly_credits_snapshot, duration_months_snapshot,
+    valid_from, valid_until, status
+  ) values (
+    v_user_id, p_plan_id, v_plan_name, v_monthly_credits, v_duration_months,
+    v_today, (v_today + pg_catalog.make_interval(months => v_duration_months))::date, 'active'
+  )
   returning id into v_new_package_id;
 
   return v_new_package_id;
