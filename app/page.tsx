@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { DashboardClient } from "@/app/dashboard-client";
 import { SupabaseSetup } from "@/components/supabase-setup";
 import { loadDashboardData } from "@/lib/dashboard-data";
@@ -20,6 +21,8 @@ export default function Home() {
 }
 
 async function CustomerDashboard() {
+  // Auth, database access, and the current date must all happen per request.
+  await connection();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");

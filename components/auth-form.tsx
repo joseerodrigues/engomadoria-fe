@@ -44,9 +44,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         <p className="auth-description">{heading.description}</p>
 
         <form action={formAction} className="auth-form">
-          {mode === "signup" && <label className="auth-field"><span>Nome</span><input name="fullName" type="text" autoComplete="name" minLength={2} maxLength={100} required placeholder="O seu nome" /></label>}
-          {mode !== "reset-password" && <label className="auth-field"><span>Email</span><input name="email" type="email" autoComplete="email" required placeholder="nome@email.com" /></label>}
-          {(mode === "login" || mode === "signup" || mode === "reset-password") && <label className="auth-field"><span>Palavra-passe</span><input name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={8} required placeholder="Pelo menos 8 caracteres" /></label>}
+          {mode === "signup" && <label className="auth-field"><span>Nome</span><input suppressHydrationWarning name="fullName" type="text" autoComplete="name" minLength={2} maxLength={100} required placeholder="O seu nome" /></label>}
+          {mode !== "reset-password" && <label className="auth-field"><span>Email</span><input suppressHydrationWarning name="email" type="email" autoComplete="email" required placeholder="nome@email.com" /></label>}
+          {(mode === "login" || mode === "signup" || mode === "reset-password") && <label className="auth-field"><span>Palavra-passe</span><input suppressHydrationWarning name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={8} required placeholder="Pelo menos 8 caracteres" /></label>}
 
           {state.error && <p className="auth-message error" role="alert">{state.error}</p>}
           {state.success && <p className="auth-message success" role="status">{state.success}</p>}
