@@ -13,6 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - This project is the frontend for an app that lets customers manage their ironing packages.
 - Packages can be configured by garment capacity, for example, 30 pieces per month.
 - Customers can switch among active package plans; a plan change takes effect immediately and must preserve prior package and delivery history.
+- Every database insert, update, or delete on app-owned customer, delivery, package, garment, and auth-user data must be captured in restricted audit logs.
 - Garments can consume different numbers of package slots; the slot value is configurable per garment type.
 - Customers can view their package usage for the current period and register new usage by choosing garment types and quantities in each ironing drop-off.
 - Customers can review historical usage statistics by garment category over a selected time period.

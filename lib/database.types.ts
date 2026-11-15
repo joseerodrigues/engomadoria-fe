@@ -15,6 +15,45 @@ export type Database = {
         Update: { id?: string; name_pt?: string; singular_pt?: string; credits_per_piece?: number; icon?: string; is_active?: boolean };
         Relationships: [];
       };
+      audit_logs: {
+        Row: {
+          id: number;
+          occurred_at: string;
+          actor_id: string | null;
+          subject_customer_id: string | null;
+          table_schema: string;
+          table_name: string;
+          operation: "INSERT" | "UPDATE" | "DELETE";
+          record_id: string | null;
+          old_data: Json | null;
+          new_data: Json | null;
+        };
+        Insert: {
+          id?: number;
+          occurred_at?: string;
+          actor_id?: string | null;
+          subject_customer_id?: string | null;
+          table_schema: string;
+          table_name: string;
+          operation: "INSERT" | "UPDATE" | "DELETE";
+          record_id?: string | null;
+          old_data?: Json | null;
+          new_data?: Json | null;
+        };
+        Update: {
+          id?: number;
+          occurred_at?: string;
+          actor_id?: string | null;
+          subject_customer_id?: string | null;
+          table_schema?: string;
+          table_name?: string;
+          operation?: "INSERT" | "UPDATE" | "DELETE";
+          record_id?: string | null;
+          old_data?: Json | null;
+          new_data?: Json | null;
+        };
+        Relationships: [];
+      };
       customer_packages: {
         Row: { id: string; customer_id: string; plan_id: string; valid_from: string; valid_until: string | null; status: "active" | "ended" };
         Insert: { id?: string; customer_id: string; plan_id: string; valid_from?: string; valid_until?: string | null; status?: "active" | "ended" };

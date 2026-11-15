@@ -6,7 +6,7 @@ Customer dashboard for managing an ironing package. Customer accounts, package u
 
 1. Create a Supabase project.
 2. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` from the project's Connect panel.
-3. Run the SQL migrations in `supabase/migrations/` in timestamp order. They create the package and garment catalog, customer data tables, row-level security policies, atomic delivery operations, and package switching.
+3. Run the SQL migrations in `supabase/migrations/` in timestamp order. They create the package and garment catalog, customer data tables, row-level security policies, atomic delivery operations, package switching, and audit logging.
 4. In Supabase Auth URL Configuration, allow the local callback `http://localhost:3000/auth/callback`. For phone testing, also allow `http://<computer-lan-ip>:3000/auth/callback`. Add the deployed app's `/auth/callback` URL before production use. Set `NEXT_PUBLIC_SITE_URL` to the deployed origin for email verification and password-reset links.
 5. Start the app:
 
@@ -20,6 +20,8 @@ New accounts receive an active Essencial package with 30 monthly credits. Delive
 The current SQL migrations can be safely run again against the initialized schema. Migrations that change catalog or configuration data should use deterministic upserts so existing rows can be replaced. Schema changes should preserve customer package and delivery history unless a migration explicitly documents a data replacement. Customers can switch among the configured plans; a change takes effect immediately, while prior package records and deliveries remain in history.
 
 The migration enables row-level security and only grants customers read access to their own records. Delivery creation is performed through a database function that checks the signed-in user, active package, garment catalog, quantities, and current credit values.
+
+Database triggers audit inserts, updates, and deletes on package plans, garment types, customer packages, deliveries, delivery items, and auth users. Audit rows are not available to customer sessions; service-role access is required. Auth-user snapshots include identifiers and confirmation timestamps only, never passwords or tokens.
 
 ## Environment variables
 
