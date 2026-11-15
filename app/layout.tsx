@@ -2,12 +2,12 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Fio a Fio — O seu cuidado, ao seu ritmo",
+  title: "Roupa em Dia — O cuidado da sua roupa, ao seu ritmo",
   description: "Acompanhe o seu pacote de engomadoria, registe entregas e veja as suas estatísticas.",
-  applicationName: "Fio a Fio",
+  applicationName: "Roupa em Dia",
   appleWebApp: {
     capable: true,
-    title: "Fio a Fio",
+    title: "Roupa em Dia",
     statusBarStyle: "default",
   },
   icons: {

@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Fio a Fio — O seu cuidado, ao seu ritmo",
-    short_name: "Fio a Fio",
+    name: "Roupa em Dia — O cuidado da sua roupa, ao seu ritmo",
+    short_name: "Roupa em Dia",
     description: "Acompanhe o seu pacote de engomadoria e registe entregas.",
     start_url: "/",
     scope: "/",

@@ -1,6 +1,6 @@
-# Fio a Fio
+# Roupa em Dia
 
-Customer dashboard for managing an ironing package. Customer accounts, package usage, and delivery history are stored in Supabase PostgreSQL.
+Customer dashboard by Engomadoria Gest for managing an ironing package. Customer accounts, package usage, and delivery history are stored in Supabase PostgreSQL.
 
 ## Local setup
 

@@ -24,5 +24,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Customers can edit or delete their recorded deliveries.
 - The customer experience must work well in desktop web browsers and on mobile devices. Mobile uses distinct tab-navigated screens, readable text sizes, and full-screen flows instead of popup dialogs.
 - The mobile web app is installable as a standalone PWA with platform-specific home-screen installation guidance; data and actions require an internet connection.
+- The customer-facing app brand is Roupa em Dia, endorsed by Engomadoria Gest. Use the sage and cream palette with a folded-clothes-and-check icon across browser and PWA assets.
 - Database migrations must account for existing data and be safe to re-run against an initialized schema: use idempotent DDL, explicit backfills or deterministic upserts when replacing catalog/configuration rows, preserve customer history by default, and never assume production tables are empty.
 - These requirements are an initial project description and are expected to evolve. Update this section as requirements change, and follow the latest user-provided requirements.

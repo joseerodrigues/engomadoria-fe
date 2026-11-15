@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useActionState } from "react";
 import {
   requestPasswordResetAction,
@@ -34,9 +35,9 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
 
   return (
     <main className="auth-shell">
-      <Link href="/" className="brand auth-brand" aria-label="Fio a Fio, início">
-        <span className="brand-mark"><span aria-hidden="true">✳</span></span>
-        <span>fio<span className="brand-light">a</span>fio</span>
+      <Link href="/" className="brand auth-brand" aria-label="Roupa em Dia, por Engomadoria Gest, início">
+        <Image className="brand-mark" src="/icon-192.png" alt="" width={32} height={32} priority />
+        <span className="brand-copy"><span className="brand-title">Roupa em Dia</span><small className="brand-provider">por Engomadoria Gest</small></span>
       </Link>
       <section className="auth-card">
         <p className="eyebrow">A SUA CONTA, AO SEU RITMO</p>

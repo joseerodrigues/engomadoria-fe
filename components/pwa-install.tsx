@@ -60,7 +60,7 @@ export function PwaInstall() {
     <section className="pwa-install-card" aria-labelledby="pwa-install-title">
       <div className="pwa-install-mark" aria-hidden="true"><span>✳</span></div>
       <div className="pwa-install-content">
-        <h3 id="pwa-install-title">Leve a Fio a Fio consigo</h3>
+        <h3 id="pwa-install-title">Leve a Roupa em Dia consigo</h3>
         <p>Adicione a aplicação ao ecrã principal para a abrir numa janela própria.</p>
         {installPrompt && <button className="pwa-install-button" type="button" onClick={installApp}>Instalar aplicação</button>}
         <p className="pwa-install-help">iPhone ou iPad: no Safari, toque em Partilhar e escolha “Adicionar ao ecrã principal”. Android: use “Instalar aplicação” ou a opção de instalação no menu do navegador.</p>
