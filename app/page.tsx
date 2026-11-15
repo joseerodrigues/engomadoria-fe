@@ -58,13 +58,22 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
 }
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short" }).format(new Date(`${date}T12:00:00`));
+  const [, month, day] = date.split("-");
+  const monthNames = ["jan.", "fev.", "mar.", "abr.", "mai.", "jun.", "jul.", "ago.", "set.", "out.", "nov.", "dez."];
+  return `${Number(day)} ${monthNames[Number(month) - 1]}`;
+}
+
+function formatFullDate(date: string) {
+  const [year, month, day] = date.split("-");
+  const monthNames = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  return `${Number(day)} de ${monthNames[Number(month) - 1]} de ${year}`;
 }
 
 export default function Home() {
   const [dropoffs, setDropoffs] = useState(initialDropoffs);
   const [showForm, setShowForm] = useState(false);
   const [showAllActivity, setShowAllActivity] = useState(false);
+  const [selectedDropoff, setSelectedDropoff] = useState<Dropoff | null>(null);
   const [draft, setDraft] = useState<Partial<Record<GarmentId, number>>>({});
   const [period, setPeriod] = useState("6");
   const [activeNav, setActiveNav] = useState("Visão geral");
@@ -97,19 +106,14 @@ export default function Home() {
     event.preventDefault();
     const items = Object.fromEntries(Object.entries(draft).filter(([, count]) => count && count > 0)) as Partial<Record<GarmentId, number>>;
     if (!Object.keys(items).length) return;
-    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon" }).format(new Date());
+    const dateParts = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Lisbon", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+    const datePart = (type: string) => dateParts.find((part) => part.type === type)?.value ?? "";
+    const today = `${datePart("year")}-${datePart("month")}-${datePart("day")}`;
     setDropoffs((current) => [{ id: Date.now(), date: today, items }, ...current]);
     setDraft({});
     setShowForm(false);
     setNotice("Utilização registada com sucesso");
     window.setTimeout(() => setNotice(""), 3200);
-  }
-
-  function navigate(label: string) {
-    setActiveNav(label);
-    if (label === "Estatísticas") document.getElementById("statistics")?.scrollIntoView({ behavior: "smooth" });
-    else if (label === "Visão geral") window.scrollTo({ top: 0, behavior: "smooth" });
-    else if (label === "O meu pacote") document.getElementById("package")?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
@@ -121,10 +125,10 @@ export default function Home() {
         </a>
         <div className="workspace-label">A MINHA CONTA</div>
         <nav className="main-nav" aria-label="Navegação principal">
-          {[{ label: "Visão geral", icon: "home" }, { label: "O meu pacote", icon: "package" }, { label: "Estatísticas", icon: "chart" }].map((item) => (
-            <button key={item.label} onClick={() => navigate(item.label)} className={`nav-link ${activeNav === item.label ? "active" : ""}`}>
+          {[{ label: "Visão geral", icon: "home", href: "#top" }, { label: "O meu pacote", icon: "package", href: "#package" }, { label: "Estatísticas", icon: "chart", href: "#statistics" }].map((item) => (
+            <a key={item.label} href={item.href} onClick={() => setActiveNav(item.label)} aria-current={activeNav === item.label ? "page" : undefined} className={`nav-link ${activeNav === item.label ? "active" : ""}`}>
               <Icon name={item.icon} size={19} /><span>{item.label}</span>{item.label === "Visão geral" && <span className="nav-dot" />}
-            </button>
+            </a>
           ))}
         </nav>
         <div className="sidebar-bottom">
@@ -141,7 +145,7 @@ export default function Home() {
 
         <div className="page-content">
           <section className="welcome-row">
-            <div><p className="eyebrow"><Icon name="sun" size={15} /> QUARTA-FEIRA, 18 DE NOVEMBRO</p><h1>Bom dia, Mariana<span className="wave">✳</span></h1><p className="welcome-subtitle">A sua roupa está em boas mãos. Veja como vai o seu mês.</p></div>
+            <div><p className="eyebrow"><Icon name="sun" size={15} /> O SEU MÊS DE NOVEMBRO</p><h1>Bom dia, Mariana<span className="wave">✳</span></h1><p className="welcome-subtitle">A sua roupa está em boas mãos. Veja como vai o seu mês.</p></div>
             <button className="primary-button" onClick={() => setShowForm(true)}><Icon name="plus" size={18} />Registar utilização</button>
           </section>
 
@@ -167,7 +171,7 @@ export default function Home() {
                   const itemCount = Object.values(dropoff.items).reduce((sum, count) => sum + (count ?? 0), 0);
                   const slotCount = garments.reduce((sum, garment) => sum + (dropoff.items[garment.id] ?? 0) * garment.slots, 0);
                   const description = garments.filter((garment) => dropoff.items[garment.id]).map((garment) => `${dropoff.items[garment.id]} ${garment.name.toLocaleLowerCase("pt-PT")}`).join(", ");
-                  return <div className="activity-item" key={dropoff.id}><span className="activity-icon"><Icon name="package" size={17} /></span><div className="activity-copy"><strong>Entrega de roupa</strong><span>{description}</span></div><div className="activity-meta"><strong>{itemCount} peças <span>·</span> {slotCount} créditos</strong><small>{formatDate(dropoff.date)}</small></div></div>;
+                  return <button type="button" className="activity-item" key={dropoff.id} aria-label={`Ver entrega de ${formatDate(dropoff.date)}: ${description}`} onClick={() => setSelectedDropoff(dropoff)}><span className="activity-icon"><Icon name="package" size={17} /></span><span className="activity-copy"><strong>Entrega de roupa</strong><span>{description}</span></span><span className="activity-meta"><strong>{itemCount} peças <span>·</span> {slotCount} créditos</strong><small>{formatDate(dropoff.date)}</small></span><span className="activity-open" aria-hidden="true"><Icon name="arrow" size={14} /></span></button>;
                 })}
               </div>
               <button className="mobile-see-all" onClick={() => setShowAllActivity((value) => !value)}>{showAllActivity ? "Ver menos" : "Ver toda a atividade"} <Icon name="arrow" size={14} /></button>
@@ -185,6 +189,8 @@ export default function Home() {
       </section>
 
       {notice && <div className="toast" role="status"><span><Icon name="check" size={17} /></span>{notice}</div>}
+
+      {selectedDropoff && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedDropoff(null); }}><section className="usage-modal detail-modal" role="dialog" aria-modal="true" aria-labelledby="delivery-title"><div className="modal-heading"><div><span className="eyebrow"><Icon name="calendar" size={14} /> ENTREGA · {formatFullDate(selectedDropoff.date).toLocaleUpperCase("pt-PT")}</span><h2 id="delivery-title">Detalhe da entrega</h2><p>Peças incluídas nesta utilização.</p></div><button className="close-button" onClick={() => setSelectedDropoff(null)} aria-label="Fechar detalhe da entrega"><Icon name="close" size={19} /></button></div><div className="delivery-detail-items">{garments.filter((garment) => (selectedDropoff.items[garment.id] ?? 0) > 0).map((garment) => <div className="delivery-detail-item" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={18} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><strong className="delivery-detail-count">{selectedDropoff.items[garment.id]} <small>× {garment.slots}</small></strong><strong className="delivery-detail-subtotal">{(selectedDropoff.items[garment.id] ?? 0) * garment.slots}</strong></div>)}</div><div className="delivery-detail-total"><span>{Object.values(selectedDropoff.items).reduce((sum, count) => sum + (count ?? 0), 0)} peças entregues</span><strong>{garments.reduce((sum, garment) => sum + (selectedDropoff.items[garment.id] ?? 0) * garment.slots, 0)} créditos</strong></div></section></div>}
 
       {showForm && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowForm(false); }}><section className="usage-modal" role="dialog" aria-modal="true" aria-labelledby="usage-title"><div className="modal-heading"><div><span className="eyebrow">A SUA CONTA, AO SEU RITMO</span><h2 id="usage-title">Registar utilização</h2><p>Que peças deixou para cuidar hoje?</p></div><button className="close-button" onClick={() => setShowForm(false)} aria-label="Fechar"><Icon name="close" size={19} /></button></div><form onSubmit={saveDropoff}><div className="garment-options">{garments.map((garment) => <div className="garment-option" key={garment.id}><span className={`garment-option-icon symbol-${garment.id}`}><Icon name={garment.icon} size={18} /></span><span className="garment-option-name"><strong>{garment.name}</strong><small>{garment.slots} {garment.slots === 1 ? "crédito" : "créditos"} por peça</small></span><div className="quantity-control"><button type="button" onClick={() => addGarment(garment.id, -1)} aria-label={`Remover ${garment.singular}`}>−</button><span>{draft[garment.id] ?? 0}</span><button type="button" onClick={() => addGarment(garment.id, 1)} aria-label={`Adicionar ${garment.singular}`}>+</button></div></div>)}</div><div className="modal-summary"><span>Créditos desta entrega</span><strong>{garments.reduce((sum, garment) => sum + (draft[garment.id] ?? 0) * garment.slots, 0)}</strong></div><button className="primary-button modal-submit" type="submit" disabled={!Object.values(draft).some((count) => count && count > 0)}>Guardar utilização <Icon name="arrow" size={16} /></button><p className="modal-footnote"><Icon name="sparkle" size={14} /> A sua utilização atualiza-se assim que guardar.</p></form></section></div>}
     </main>

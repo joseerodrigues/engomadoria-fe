@@ -25,13 +25,14 @@ button, select { font: inherit; }
 button { color: inherit; }
 button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid #96baa4; outline-offset: 3px; }
 .app-shell { min-height: 100vh; }
+#top, #package, #statistics { scroll-margin-top: 80px; }
 .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; display: flex; flex-direction: column; width: 246px; padding: 29px 17px 17px; border-right: 1px solid #e9ece9; background: #fff; }
 .brand { display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #2c4438; font-size: 21px; font-weight: 700; letter-spacing: -1px; text-decoration: none; }
 .brand-light { color: #89968e; font-weight: 400; }
 .brand-mark { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 11px; background: #e8f0e9; color: #47735c; }
 .workspace-label { margin: 48px 12px 13px; color: #a1a9a5; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; }
 .main-nav { display: grid; gap: 5px; }
-.nav-link { position: relative; display: flex; align-items: center; gap: 12px; min-height: 43px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #7b8580; text-align: left; cursor: pointer; }
+.nav-link { position: relative; display: flex; align-items: center; gap: 12px; min-height: 43px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #7b8580; text-align: left; text-decoration: none; cursor: pointer; }
 .nav-link:hover { background: #f7f9f7; color: #3d614e; }
 .nav-link.active { background: #edf4ef; color: #3b684f; font-weight: 600; }
 .nav-dot { width: 5px; height: 5px; margin-left: auto; border-radius: 50%; background: #589071; }
@@ -112,6 +113,10 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
 .quiet-button { gap: 5px; padding-top: 4px; white-space: nowrap; }
 .activity-list { margin-top: 13px; }
 .activity-item { display: flex; min-height: 58px; align-items: center; gap: 10px; border-top: 1px solid #f0f1ef; }
+button.activity-item { width: 100%; padding: 0; border-right: 0; border-bottom: 0; border-left: 0; background: #fff; text-align: left; cursor: pointer; transition: background .15s; }
+button.activity-item:hover { background: #fafbf9; }
+.activity-open { display: grid; flex: 0 0 19px; width: 19px; height: 19px; place-items: center; border-radius: 5px; color: #7b9282; opacity: .5; transition: opacity .15s, background .15s; }
+button.activity-item:hover .activity-open, button.activity-item:focus-visible .activity-open { background: #edf4ef; opacity: 1; }
 .activity-icon { display: grid; flex: 0 0 32px; width: 32px; height: 32px; place-items: center; border-radius: 9px; background: #f2f5f1; color: #68836f; }
 .activity-copy { display: grid; min-width: 0; flex: 1; gap: 4px; }
 .activity-copy strong, .activity-meta strong { overflow: hidden; color: #49544e; font-size: 10px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
@@ -166,6 +171,14 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
 .modal-submit { width: 100%; margin-top: 17px; }
 .modal-footnote { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 12px 0 0; color: #a0a8a3; font-size: 9px; }
 .modal-footnote svg { color: #af9364; }
+.delivery-detail-items { display: grid; margin-top: 7px; }
+.delivery-detail-item { display: flex; min-height: 60px; align-items: center; gap: 11px; border-bottom: 1px solid #f0f1ef; }
+.delivery-detail-item .garment-option-name { flex: 1; }
+.delivery-detail-count { min-width: 35px; color: #59665e; font-size: 11px; font-weight: 500; text-align: right; }
+.delivery-detail-count small { color: #9ba39e; font-size: 9px; font-weight: 400; }
+.delivery-detail-subtotal { min-width: 25px; color: #4c725b; font-size: 11px; font-weight: 600; text-align: right; }
+.delivery-detail-total { display: flex; justify-content: space-between; margin-top: 17px; padding: 13px 12px; border-radius: 8px; background: #f4f7f3; color: #738078; font-size: 10px; }
+.delivery-detail-total strong { color: #486c57; font-size: 11px; }
 .toast { position: fixed; z-index: 30; right: 26px; bottom: 24px; display: flex; align-items: center; gap: 10px; padding: 12px 16px 12px 12px; border: 1px solid #dce9de; border-radius: 9px; background: #fff; color: #4e6857; font-size: 11px; box-shadow: 0 8px 25px #243d2d20; animation: modal-in .2s ease-out; }
 .toast > span { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: #edf5ee; color: #568065; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
@@ -238,6 +251,8 @@ h1 { margin-bottom: 8px; color: #28332e; font-family: Georgia, 'Times New Roman'
   .activity-copy > span { max-width: 155px; font-size: 8px; }
   .activity-meta strong { font-size: 8px; }
   .activity-meta small { font-size: 8px; }
+  .activity-item { gap: 7px; }
+  .activity-open { display: none; }
   .activity-panel > .panel-heading .quiet-button { display: none; }
   .mobile-see-all { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 0; border: 0; background: transparent; color: #55765f; font-size: 10px; font-weight: 600; cursor: pointer; }
   .category-heading { align-items: center; gap: 8px; }
